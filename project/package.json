@@ -66,6 +66,9 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
+  "dependencies": {
+    "simple-git": "^3.24.0"
+  },
   "devDependencies": {
     "@types/vscode": "^1.84.0",
     "@types/mocha": "^10.0.6",
