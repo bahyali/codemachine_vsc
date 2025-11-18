@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Code Machine Build Plan",
+  "description": "A schema for the todo.json file, which defines the build plan as a series of nested iterations and tasks.",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/iteration"
+  },
+  "definitions": {
+    "task": {
+      "type": "object",
+      "description": "Represents a single, atomic build task.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "A unique identifier for the task (e.g., 'I1.T1')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable description of what the task will accomplish."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current execution status of the task.",
+          "enum": [
+            "pending",
+            "done",
+            "failed"
+          ]
+        },
+        "dependencies": {
+          "type": "array",
+          "description": "A list of task IDs that must be completed before this task can start.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "file_paths": {
+          "type": "array",
+          "description": "A list of file paths that are expected to be created or modified by this task.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "status"
+      ]
+    },
+    "iteration": {
+      "type": "object",
+      "description": "Represents a logical grouping of tasks and/or other iterations.",
+      "properties": {
+        "iteration_id": {
+          "type": "string",
+          "description": "A unique identifier for the iteration (e.g., 'I1')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable description of the iteration's goal."
+        },
+        "status": {
+          "type": "string",
+          "description": "The overall status of the iteration.",
+          "enum": [
+            "pending",
+            "in-progress",
+            "completed"
+          ]
+        },
+        "tasks": {
+          "type": "array",
+          "description": "A list of tasks belonging to this iteration.",
+          "items": {
+            "$ref": "#/definitions/task"
+          }
+        },
+        "iterations": {
+          "type": "array",
+          "description": "A list of nested sub-iterations.",
+          "items": {
+            "$ref": "#/definitions/iteration"
+          }
+        }
+      },
+      "required": [
+        "iteration_id",
+        "status"
+      ]
+    }
+  }
+}
