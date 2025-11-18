@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const workflowController = new WorkflowController(outputChannel);
 	outputChannel.appendLine(`Workflow initialized in phase: ${Phase[workflowController.currentPhase]}`);
-	vscode.window.setContext('codeMachine.phase', Phase[workflowController.currentPhase]);
+	vscode.commands.executeCommand('setContext', 'codeMachine.phase', Phase[workflowController.currentPhase]);
 
 	// Register Tree View
 	const taskTreeProvider = new TaskTreeProvider();

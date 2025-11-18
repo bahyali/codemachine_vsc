@@ -33,7 +33,7 @@ export class WorkflowController {
         const phaseName = Phase[phase];
         this._outputChannel.appendLine(`Phase changed to ${phaseName}`);
         this._onDidPhaseChange.fire(this._currentPhase);
-        vscode.window.setContext('codeMachine.phase', phaseName);
+        vscode.commands.executeCommand('setContext', 'codeMachine.phase', phaseName);
     }
 
     public updatePhaseFromArtifact(uri: vscode.Uri): void {
