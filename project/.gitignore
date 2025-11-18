@@ -9,9 +9,9 @@
 /coverage
 
 # production
-/out
-/dist
 /build
+/dist
+/out
 
 # misc
 .DS_Store
@@ -31,9 +31,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-/out/
 
-# vs code
-.vscode/
+# vscode
 .vscode-test/
+.vscode-test-web/
 *.vsix
