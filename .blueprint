@@ -1,0 +1,1 @@
+{"project": {"name": "codemachine_vscode_ext_v2: Req. Project", "description": "This is a requirements project."}, "project_config": {"project_dir": "projects/codemachine_vscode_ext_v2", "graph_file": "graph.json", "src_dir": "project", "tickets_dir": "tickets", "artifacts_dir": "artifacts"}}
