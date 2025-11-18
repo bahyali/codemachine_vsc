@@ -1,0 +1,30 @@
+
+> code-machine-orchestrator@0.0.1 pretest
+> npm run compile && npm run lint
+
+
+> code-machine-orchestrator@0.0.1 compile
+> tsc -p ./
+
+
+> code-machine-orchestrator@0.0.1 lint
+> eslint src --ext ts
+
+
+> code-machine-orchestrator@0.0.1 test
+> node ./out/test/runTest.js
+
+[90m[main 2025-11-18T20:21:41.977Z][0m update#setState disabled
+[90m[main 2025-11-18T20:21:41.978Z][0m update#ctor - updates are disabled by the environment
+ChatSessionStore: Migrating 0 chat sessions from storage service to file system
+Started local extension host with pid 12065.
+Loading development extension at /Users/bahy/Documents/playground/capstone_project/server/projects/codemachine_vscode_ext_v2/project
+MCP Registry configured: https://api.mcp.github.com
+Settings Sync: Account status changed from uninitialized to unavailable
+Congratulations, your extension "code-machine-orchestrator" is now active!
+[0m[0m
+[0m  Extension Test Suite[0m
+  [32m  ✔[0m[90m Sample test[0m
+[92m [0m[32m 1 passing[0m[90m (2ms)[0m
+[90m[main 2025-11-18T20:21:42.940Z][0m Extension host with pid 12065 exited with code: 0, signal: unknown.
+Exit code:   0
