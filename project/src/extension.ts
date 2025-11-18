@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { WorkflowController, Phase } from './controllers/WorkflowController';
 import { ArtifactWatcher } from './services/ArtifactWatcher';
 import { registerNewProjectCommand } from './commands/newProject';
+import { registerShowArchitecturePreviewCommand } from './commands/showArchitecturePreview';
 
 export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('Code Machine');
@@ -16,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register commands
 	registerNewProjectCommand(context);
+	registerShowArchitecturePreviewCommand(context);
 
 	context.subscriptions.push(outputChannel, artifactWatcher);
 }

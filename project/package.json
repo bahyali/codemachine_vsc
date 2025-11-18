@@ -12,7 +12,8 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onCommand:codemachine.newProject"
+    "onCommand:codemachine.newProject",
+    "onCommand:codemachine.showArchitecturePreview"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -20,6 +21,10 @@
       {
         "command": "codemachine.newProject",
         "title": "Code Machine: New Project"
+      },
+      {
+        "command": "codemachine.showArchitecturePreview",
+        "title": "Code Machine: Show Architecture Preview"
       }
     ],
     "viewsContainers": {
@@ -66,6 +71,8 @@
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
     "typescript": "^5.2.2",
-    "@vscode/test-electron": "^2.3.6"
+    "@vscode/test-electron": "^2.3.6",
+    "markdown-it": "^14.1.0",
+    "@types/markdown-it": "^13.0.7"
   }
 }
