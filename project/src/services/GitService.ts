@@ -32,12 +32,23 @@ export class GitService {
     }
 
     /**
-     * Stages all changes and commits them with a given message.
+     * Stages all changes.
+     */
+    public async stageAllChanges(): Promise<void> {
+        try {
+            await this.git.add('./*');
+        } catch (error) {
+            console.error('Failed to stage changes:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Commits staged changes with a given message.
      * @param message The commit message.
      */
     public async commit(message: string): Promise<void> {
         try {
-            await this.git.add('./*');
             await this.git.commit(message);
         } catch (error) {
             console.error(`Failed to commit with message "${message}":`, error);

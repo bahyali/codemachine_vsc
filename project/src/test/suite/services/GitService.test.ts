@@ -36,6 +36,7 @@ suite('GitService Test Suite', () => {
         const commitMessage = 'Initial commit';
         await fs.writeFile(testFilePath, 'hello world');
         
+        await gitService.stageAllChanges();
         await gitService.commit(commitMessage);
 
         // Verify the commit
@@ -50,11 +51,13 @@ suite('GitService Test Suite', () => {
         const testFilePath = path.join(testRepoPath, 'test.txt');
         const initialContent = 'This is the first version.';
         await fs.writeFile(testFilePath, initialContent);
+        await gitService.stageAllChanges();
         await gitService.commit('First commit');
 
         // Modify the file and make a second commit
         const secondContent = 'This is the second version.';
         await fs.writeFile(testFilePath, secondContent);
+        await gitService.stageAllChanges();
         await gitService.commit('Second commit');
 
         // Verify the second commit and content change
@@ -80,9 +83,11 @@ suite('GitService Test Suite', () => {
         await gitService.init();
         const testFilePath = path.join(testRepoPath, 'test.txt');
         await fs.writeFile(testFilePath, 'line 1\n');
+        await gitService.stageAllChanges();
         await gitService.commit('First commit');
 
         await fs.appendFile(testFilePath, 'line 2\n');
+        await gitService.stageAllChanges();
         await gitService.commit('Second commit');
 
         const diff = await gitService.getDiff();

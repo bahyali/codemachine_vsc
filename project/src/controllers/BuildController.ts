@@ -22,11 +22,11 @@ export class BuildController {
             
             this.outputChannel.appendLine(`Task ${taskId} completed successfully.`);
             
-            // Stage and commit the changes
-            await this.gitService.commit(`feat: Implement task ${taskId}`);
-            this.outputChannel.appendLine(`Changes for task ${taskId} committed.`);
+            // Stage the changes
+            await this.gitService.stageAllChanges();
+            this.outputChannel.appendLine(`Changes for task ${taskId} staged.`);
 
-            vscode.window.showInformationMessage(`Task ${taskId} finished and committed.`);
+            vscode.window.showInformationMessage(`Task ${taskId} finished. Changes are staged and ready for review.`);
 
         } catch (error) {
             const errorMessage = `Failed to run task ${taskId}: ${error instanceof Error ? error.message : String(error)}`;
