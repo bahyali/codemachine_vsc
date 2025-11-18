@@ -4,6 +4,7 @@ import { ArtifactWatcher } from './services/ArtifactWatcher';
 import { registerNewProjectCommand } from './commands/newProject';
 import { registerShowArchitecturePreviewCommand } from './commands/showArchitecturePreview';
 import { registerApprovePlanCommand } from './commands/approvePlan';
+import { registerReviewCommands } from './commands/reviewCommands';
 import { TaskTreeProvider } from './views/sidebar/TaskTreeProvider';
 import { BuildController } from './controllers/BuildController';
 import { CliService } from './services/CliService';
@@ -42,6 +43,8 @@ export function activate(context: vscode.ExtensionContext) {
     const gitService = new GitService(workspaceRoot);
     const reviewController = new ReviewController(gitService, workspaceRoot);
     const buildController = new BuildController(cliService, gitService, outputChannel, workspaceRoot, reviewController);
+
+    registerReviewCommands(context, buildController, gitService, workspaceRoot);
 
     const runTaskCommand = vscode.commands.registerCommand('codemachine.runTask', async () => {
         // This is a placeholder to get the taskId for testing.
