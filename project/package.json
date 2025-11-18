@@ -14,7 +14,8 @@
     "onStartupFinished",
     "onCommand:codemachine.newProject",
     "onCommand:codemachine.showArchitecturePreview",
-    "onCommand:codemachine.approvePlan"
+    "onCommand:codemachine.approvePlan",
+    "onCommand:codemachine.runTask"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -30,6 +31,11 @@
       {
         "command": "codemachine.approvePlan",
         "title": "Code Machine: Approve Plan"
+      },
+      {
+        "command": "codemachine.runTask",
+        "title": "Code Machine: Run Task",
+        "category": "Code Machine"
       }
     ],
     "viewsContainers": {

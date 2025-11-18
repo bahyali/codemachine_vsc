@@ -5,6 +5,9 @@ import { registerNewProjectCommand } from './commands/newProject';
 import { registerShowArchitecturePreviewCommand } from './commands/showArchitecturePreview';
 import { registerApprovePlanCommand } from './commands/approvePlan';
 import { TaskTreeProvider } from './views/sidebar/TaskTreeProvider';
+import { BuildController } from './controllers/BuildController';
+import { CliService } from './services/CliService';
+import { GitService } from './services/GitService';
 
 export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('Code Machine');
@@ -27,7 +30,27 @@ export function activate(context: vscode.ExtensionContext) {
 	registerShowArchitecturePreviewCommand(context);
 	registerApprovePlanCommand(context, workflowController);
 
-	context.subscriptions.push(outputChannel, artifactWatcher, taskBoardView);
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+        vscode.window.showErrorMessage('Code Machine requires an open folder to work.');
+        return;
+    }
+    const workspaceRoot = workspaceFolders[0].uri.fsPath;
+
+    const cliService = new CliService();
+    const gitService = new GitService(workspaceRoot); 
+    const buildController = new BuildController(cliService, gitService, outputChannel, workspaceRoot);
+
+    const runTaskCommand = vscode.commands.registerCommand('codemachine.runTask', async () => {
+        // This is a placeholder to get the taskId for testing.
+        // Later, this will be passed from the TreeView context menu.
+        const taskId = await vscode.window.showInputBox({ prompt: 'Enter the Task ID to run' });
+        if (taskId) {
+            await buildController.runTask(taskId);
+        }
+    });
+
+	context.subscriptions.push(outputChannel, artifactWatcher, taskBoardView, runTaskCommand);
 }
 
 export function deactivate() {}
