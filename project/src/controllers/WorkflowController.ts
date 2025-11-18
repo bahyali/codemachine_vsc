@@ -34,6 +34,10 @@ export class WorkflowController {
                 this._currentPhase = Phase.Arch;
                 this._outputChannel.appendLine(`Phase changed to Arch based on creation of ${filename}`);
                 break;
+            case 'todo.json':
+                this._currentPhase = Phase.Plan;
+                this._outputChannel.appendLine(`Phase changed to Plan based on creation of ${filename}`);
+                break;
             // Add other cases as needed for plan.md, todo.json etc.
         }
     }
