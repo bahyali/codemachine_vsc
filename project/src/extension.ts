@@ -14,11 +14,11 @@ export function activate(context: vscode.ExtensionContext) {
 	const workflowController = new WorkflowController(outputChannel);
 	outputChannel.appendLine(`Workflow initialized in phase: ${Phase[workflowController.currentPhase]}`);
 
-	const artifactWatcher = new ArtifactWatcher(workflowController, outputChannel);
-
 	// Register Tree View
 	const taskTreeProvider = new TaskTreeProvider();
 	const taskBoardView = vscode.window.registerTreeDataProvider('codeMachine.taskBoard', taskTreeProvider);
+
+	const artifactWatcher = new ArtifactWatcher(workflowController, taskTreeProvider, outputChannel);
 
 	// Register commands
 	registerNewProjectCommand(context);
