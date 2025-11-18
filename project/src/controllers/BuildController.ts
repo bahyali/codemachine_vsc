@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { CliService } from '../services/CliService';
 import { GitService } from '../services/GitService';
+import { ReviewController } from './ReviewController';
 
 export class BuildController {
     constructor(
@@ -8,6 +9,7 @@ export class BuildController {
         private readonly gitService: GitService,
         private readonly outputChannel: vscode.OutputChannel,
         private readonly workspaceRoot: string,
+        private readonly reviewController: ReviewController,
     ) {}
 
     public async runTask(taskId: string): Promise<void> {
@@ -27,6 +29,8 @@ export class BuildController {
             this.outputChannel.appendLine(`Changes for task ${taskId} staged.`);
 
             vscode.window.showInformationMessage(`Task ${taskId} finished. Changes are staged and ready for review.`);
+
+            await this.reviewController.showDiffForStagedChanges();
 
         } catch (error) {
             const errorMessage = `Failed to run task ${taskId}: ${error instanceof Error ? error.message : String(error)}`;

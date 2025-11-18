@@ -83,4 +83,21 @@ export class GitService {
             throw error;
         }
     }
+
+    /**
+     * Gets the list of staged files.
+     * @returns A promise that resolves with an array of staged file paths.
+     */
+    public async getStagedChanges(): Promise<string[]> {
+        try {
+            const diffSummary = await this.git.diff(['--cached', '--name-only']);
+            if (!diffSummary) {
+                return [];
+            }
+            return diffSummary.split('\n').filter(file => file.length > 0);
+        } catch (error) {
+            console.error('Failed to get staged changes:', error);
+            throw error;
+        }
+    }
 }

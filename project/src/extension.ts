@@ -8,6 +8,7 @@ import { TaskTreeProvider } from './views/sidebar/TaskTreeProvider';
 import { BuildController } from './controllers/BuildController';
 import { CliService } from './services/CliService';
 import { GitService } from './services/GitService';
+import { ReviewController } from './controllers/ReviewController';
 
 export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('Code Machine');
@@ -38,8 +39,9 @@ export function activate(context: vscode.ExtensionContext) {
     const workspaceRoot = workspaceFolders[0].uri.fsPath;
 
     const cliService = new CliService();
-    const gitService = new GitService(workspaceRoot); 
-    const buildController = new BuildController(cliService, gitService, outputChannel, workspaceRoot);
+    const gitService = new GitService(workspaceRoot);
+    const reviewController = new ReviewController(gitService, workspaceRoot);
+    const buildController = new BuildController(cliService, gitService, outputChannel, workspaceRoot, reviewController);
 
     const runTaskCommand = vscode.commands.registerCommand('codemachine.runTask', async () => {
         // This is a placeholder to get the taskId for testing.
