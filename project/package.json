@@ -14,7 +14,33 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
-  "contributes": {},
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "code-machine-container",
+          "title": "Code Machine",
+          "icon": "$(beaker)"
+        }
+      ]
+    },
+    "views": {
+      "code-machine-container": [
+        {
+          "id": "codeMachine.projectState",
+          "name": "Project State"
+        },
+        {
+          "id": "codeMachine.taskBoard",
+          "name": "Task Board"
+        },
+        {
+          "id": "codeMachine.artifacts",
+          "name": "Artifacts"
+        }
+      ]
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
