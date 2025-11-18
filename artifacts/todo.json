@@ -99,12 +99,17 @@
         },
         "output": "~~~\n#- file: docs/diagrams/system_component.puml\n@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n\ntitle System Component Diagram for Code Machine Orchestrator\n\nSystem_Boundary(extension_boundary, \"Code Machine Extension\") {\n    \n    Container(ui_layer, \"UI Components\", \"VS Code API / Webviews\", \"Sidebar, TreeView, Prompt Wizard, Diagram Preview.\")\n    \n    Container(controller, \"Workflow Controller\", \"TypeScript Class\", \"Orchestrates the state machine (Specs -> Arch -> Plan -> Build).\")\n    \n    Container(cli_wrapper, \"CLI Wrapper Service\", \"TypeScript / child_process\", \"Manages Python process lifecycle, parses stdout/stderr.\")\n    \n    Container(fs_watcher, \"State Monitor\", \"VS Code FileSystemWatcher\", \"Watches artifacts/ folder for changes to update UI.\")\n    \n    Container(git_service, \"Git Integration\", \"TypeScript / SimpleGit\", \"Handles commits, reverts, and diff staging.\")\n}\n\nContainerDb(artifacts, \"Project Artifacts\", \"JSON / Markdown\", \"todo.json, requirements.md, architecture.md\")\nContainer(external_cli, \"Python CLI Process\", \"Python\", \"Executes generation logic.\")\n\nRel(ui_layer, controller, \"Sends User Actions\")\nRel(controller, ui_layer, \"Updates View State\")\n\nRel(controller, cli_wrapper, \"Triggers Commands\")\nRel(cli_wrapper, external_cli, \"Spawns process\", \"Shell\")\n\nRel(controller, git_service, \"Requests Diff/Revert\")\nRel(git_service, artifacts, \"Git Operations\")\n\nRel(external_cli, artifacts, \"Writes\")\nRel(fs_watcher, artifacts, \"Observes\")\nRel(fs_watcher, controller, \"Triggers Refresh\")\n\n@enduml\n~~~",
         "iteration_id": "I1",
-        "completed": false,
+        "completed": true,
         "target_files": [
             "docs/diagrams/system_component.puml"
         ],
         "input_files": [],
-        "files": []
+        "files": [
+            {
+                "path": "docs/diagrams/system_component.puml",
+                "content": "@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n\ntitle System Component Diagram for Code Machine Orchestrator\n\nSystem_Boundary(extension_boundary, \"Code Machine Extension\") {\n    \n    Container(ui_layer, \"UI Components\", \"VS Code API / Webviews\", \"Sidebar, TreeView, Prompt Wizard, Diagram Preview.\")\n    \n    Container(controller, \"Workflow Controller\", \"TypeScript Class\", \"Orchestrates the state machine (Specs -> Arch -> Plan -> Build).\")\n    \n    Container(cli_wrapper, \"CLI Wrapper Service\", \"TypeScript / child_process\", \"Manages Python process lifecycle, parses stdout/stderr.\")\n    \n    Container(fs_watcher, \"State Monitor\", \"VS Code FileSystemWatcher\", \"Watches artifacts/ folder for changes to update UI.\")\n    \n    Container(git_service, \"Git Integration\", \"TypeScript / SimpleGit\", \"Handles commits, reverts, and diff staging.\")\n}\n\nContainerDb(artifacts, \"Project Artifacts\", \"JSON / Markdown\", \"todo.json, requirements.md, architecture.md\")\nContainer(external_cli, \"Python CLI Process\", \"Python\", \"Executes generation logic.\")\n\nRel(ui_layer, controller, \"Sends User Actions\")\nRel(controller, ui_layer, \"Updates View State\")\n\nRel(controller, cli_wrapper, \"Triggers Commands\")\nRel(cli_wrapper, external_cli, \"Spawns process\", \"Shell\")\n\nRel(controller, git_service, \"Requests Diff/Revert\")\nRel(git_service, artifacts, \"Git Operations\")\n\nRel(external_cli, artifacts, \"Writes\")\nRel(fs_watcher, artifacts, \"Observes\")\nRel(fs_watcher, controller, \"Triggers Refresh\")\n\n@enduml"
+            }
+        ]
     },
     {
         "name": "I1.T3",
@@ -129,7 +134,7 @@
             ],
             "parallelizable": false
         },
-        "output": null,
+        "output": "~~~\n#- file: src/services/CliService.ts\nimport * as vscode from 'vscode';\nimport { spawn } from 'child_process';\n\nexport class CliService {\n    /**\n     * Executes a command-line tool.\n     * \n     * @param command The command to execute (e.g., 'python').\n     * @param args An array of string arguments.\n     * @param outputChannel The VS Code output channel to stream stdout and stderr to.\n     * @returns A promise that resolves if the command exits with code 0, and rejects otherwise.\n     */\n    public execute(command: string, args: string[], outputChannel: vscode.OutputChannel): Promise<void> {\n        return new Promise<void>((resolve, reject) => {\n            outputChannel.appendLine(`> Running command: ${command} ${args.join(' ')}`);\n\n            const child = spawn(command, args);\n\n            // Stream stdout\n            if (child.stdout) {\n                child.stdout.on('data', (data: Buffer) => {\n                    outputChannel.append(data.toString());\n                });\n            }\n\n            // Stream stderr\n            if (child.stderr) {\n                child.stderr.on('data', (data: Buffer) => {\n                    outputChannel.append(data.toString());\n                });\n            }\n\n            // Handle spawn errors (e.g., command not found)\n            child.on('error', (error) => {\n                outputChannel.appendLine(`Error spawning process: ${error.message}`);\n                reject(error);\n            });\n\n            // Handle process exit\n            child.on('close', (code) => {\n                if (code === 0) {\n                    outputChannel.appendLine(`> Command finished with exit code ${code}.`);\n                    resolve();\n                } else {\n                    const errorMessage = `Command failed with exit code ${code}.`;\n                    outputChannel.appendLine(`> ${errorMessage}`);\n                    reject(new Error(errorMessage));\n                }\n            });\n        });\n    }\n}\n~~~\n~~~\n#- file: test/mocks/mock_cli.py\nimport sys\nimport time\n\ndef main():\n    \"\"\"\n    A mock CLI tool that simulates a long-running process.\n    It prints arguments, shows progress, and then exits.\n    \"\"\"\n    print(\"MockCli: Process started.\")\n    print(f\"MockCli: Received arguments: {sys.argv[1:]}\")\n    sys.stdout.flush()\n\n    num_steps = 3\n    for i in range(1, num_steps + 1):\n        print(f\"MockCli: Processing step {i} of {num_steps}...\")\n        sys.stdout.flush()\n        time.sleep(0.5)  # Simulate work for 0.5 seconds\n\n    print(\"MockCli: Process completed successfully.\")\n    sys.stdout.flush()\n    sys.exit(0)\n\nif __name__ == \"__main__\":\n    main()\n~~~",
         "iteration_id": "I1",
         "completed": false,
         "target_files": [
@@ -139,7 +144,12 @@
         "input_files": [
             "src/extension.ts"
         ],
-        "files": []
+        "files": [
+            {
+                "path": "src/extension.ts",
+                "content": "import * as vscode from 'vscode';\n\nexport function activate(context: vscode.ExtensionContext) {\n\n\tconsole.log('Congratulations, your extension \"code-machine-orchestrator\" is now active!');\n\n\tconst outputChannel = vscode.window.createOutputChannel('Code Machine');\n\toutputChannel.appendLine('Code Machine Orchestrator activated.');\n\toutputChannel.show(true);\n\n\tcontext.subscriptions.push(outputChannel);\n}\n\nexport function deactivate() {}"
+            }
+        ]
     },
     {
         "name": "I2.T1",
