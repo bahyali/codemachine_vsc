@@ -85,7 +85,15 @@ class PlanTreeItem extends vscode.TreeItem {
     } else {
       this.contextValue = 'task';
       this.tooltip = `${data.description}\nStatus: ${data.status}`;
-      this.description = `[${data.status}]`;
+      
+      switch (data.status) {
+        case 'done':
+          this.iconPath = new vscode.ThemeIcon('check');
+          break;
+        case 'failed':
+          this.iconPath = new vscode.ThemeIcon('error');
+          break;
+      }
     }
   }
 }
