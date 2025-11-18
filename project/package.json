@@ -2,6 +2,7 @@
   "name": "code-machine-orchestrator",
   "displayName": "Code Machine Orchestrator",
   "description": "A VS Code extension to orchestrate a requirements-to-code CLI pipeline.",
+  "publisher": "CodeMachine",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.84.0"
