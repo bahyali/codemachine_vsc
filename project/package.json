@@ -15,7 +15,9 @@
     "onCommand:codemachine.newProject",
     "onCommand:codemachine.showArchitecturePreview",
     "onCommand:codemachine.approvePlan",
-    "onCommand:codemachine.runTask"
+    "onCommand:codemachine.runTask",
+    "onCommand:codemachine.acceptChanges",
+    "onCommand:codemachine.rejectChanges"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -35,6 +37,16 @@
       {
         "command": "codemachine.runTask",
         "title": "Code Machine: Run Task",
+        "category": "Code Machine"
+      },
+      {
+        "command": "codemachine.acceptChanges",
+        "title": "Code Machine: Accept Changes",
+        "category": "Code Machine"
+      },
+      {
+        "command": "codemachine.rejectChanges",
+        "title": "Code Machine: Reject Changes",
         "category": "Code Machine"
       }
     ],
