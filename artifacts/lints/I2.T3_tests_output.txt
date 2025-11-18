@@ -1,0 +1,34 @@
+
+> code-machine-orchestrator@0.0.1 pretest
+> npm run compile && npm run lint
+
+
+> code-machine-orchestrator@0.0.1 compile
+> tsc -p ./
+
+
+> code-machine-orchestrator@0.0.1 lint
+> eslint src --ext ts
+
+
+> code-machine-orchestrator@0.0.1 test
+> node ./out/test/runTest.js
+
+[90m[main 2025-11-18T21:38:47.726Z][0m update#setState disabled
+[90m[main 2025-11-18T21:38:47.726Z][0m update#ctor - updates are disabled by the environment
+ChatSessionStore: Migrating 0 chat sessions from storage service to file system
+MCP Registry configured: https://api.mcp.github.com
+Started local extension host with pid 23701.
+Loading development extension at /Users/bahy/Documents/playground/capstone_project/server/projects/codemachine_vscode_ext_v2/project
+Settings Sync: Account status changed from uninitialized to unavailable
+[0m[0m
+[0m  Extension Test Suite[0m
+  [32m  ✔[0m[90m Extension should be present[0m
+  [32m  ✔[0m[90m Extension should activate[0m
+[0m  CliService Test Suite[0m
+  [32m  ✔[0m[90m should execute mock_cli.py successfully and stream output[0m[31m (342ms)[0m
+  [32m  ✔[0m[90m should reject promise when mock_cli.py exits with non-zero code[0m
+  [32m  ✔[0m[90m should reject promise when command does not exist[0m
+[92m [0m[32m 5 passing[0m[90m (376ms)[0m
+[90m[main 2025-11-18T21:38:49.079Z][0m Extension host with pid 23701 exited with code: 0, signal: unknown.
+Exit code:   0

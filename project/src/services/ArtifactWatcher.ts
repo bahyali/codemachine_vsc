@@ -4,9 +4,11 @@ import { WorkflowController } from '../controllers/WorkflowController';
 export class ArtifactWatcher implements vscode.Disposable {
     private _watcher: vscode.FileSystemWatcher;
     private _workflowController: WorkflowController;
+    private _outputChannel: vscode.OutputChannel;
 
-    constructor(workflowController: WorkflowController) {
+    constructor(workflowController: WorkflowController, outputChannel: vscode.OutputChannel) {
         this._workflowController = workflowController;
+        this._outputChannel = outputChannel;
 
         // A robust pattern to watch for artifacts in any subfolder of the workspace
         const globPattern = '**/artifacts/*.{md,json}';
@@ -19,12 +21,12 @@ export class ArtifactWatcher implements vscode.Disposable {
     }
 
     private onArtifactCreated(uri: vscode.Uri): void {
-        console.log(`Artifact created: ${uri.fsPath}`);
+        this._outputChannel.appendLine(`Artifact created: ${uri.fsPath}`);
         this._workflowController.updatePhaseFromArtifact(uri);
     }
 
     private onArtifactChanged(uri: vscode.Uri): void {
-        console.log(`Artifact changed: ${uri.fsPath}`);
+        this._outputChannel.appendLine(`Artifact changed: ${uri.fsPath}`);
         this._workflowController.updatePhaseFromArtifact(uri);
     }
 

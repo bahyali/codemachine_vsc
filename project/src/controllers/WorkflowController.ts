@@ -11,9 +11,11 @@ export enum Phase {
 
 export class WorkflowController {
     private _currentPhase: Phase;
+    private _outputChannel: vscode.OutputChannel;
 
-    constructor() {
+    constructor(outputChannel: vscode.OutputChannel) {
         this._currentPhase = Phase.Concept;
+        this._outputChannel = outputChannel;
     }
 
     public get currentPhase(): Phase {
@@ -26,11 +28,11 @@ export class WorkflowController {
         switch (filename) {
             case 'requirements.md':
                 this._currentPhase = Phase.Specs;
-                console.log(`Phase changed to Specs based on creation of ${filename}`);
+                this._outputChannel.appendLine(`Phase changed to Specs based on creation of ${filename}`);
                 break;
             case 'architecture.md':
                 this._currentPhase = Phase.Arch;
-                console.log(`Phase changed to Arch based on creation of ${filename}`);
+                this._outputChannel.appendLine(`Phase changed to Arch based on creation of ${filename}`);
                 break;
             // Add other cases as needed for plan.md, todo.json etc.
         }

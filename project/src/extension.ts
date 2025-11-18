@@ -8,10 +8,10 @@ export function activate(context: vscode.ExtensionContext) {
 	outputChannel.appendLine('Code Machine Orchestrator activated.');
 	outputChannel.show(true);
 
-	const workflowController = new WorkflowController();
+	const workflowController = new WorkflowController(outputChannel);
 	outputChannel.appendLine(`Workflow initialized in phase: ${Phase[workflowController.currentPhase]}`);
 
-	const artifactWatcher = new ArtifactWatcher(workflowController);
+	const artifactWatcher = new ArtifactWatcher(workflowController, outputChannel);
 
 	context.subscriptions.push(outputChannel, artifactWatcher);
 }
