@@ -1,0 +1,542 @@
+[
+    {
+        "name": "I1.T1",
+        "context": {
+            "task_id": "I1.T1",
+            "iteration_id": "I1",
+            "iteration_goal": "Initialize the project, set up the extension manifest, implement the core CLI wrapper service, and define the high-level architecture.",
+            "description": "Initialize VS Code Extension project structure using `yo code` (or manual setup) with TypeScript. Configure `package.json` with basic activation events and the \"Code Machine\" output channel.",
+            "agent_type_hint": "SetupAgent",
+            "inputs": "Project Name \"Code Machine Orchestrator\".",
+            "target_files": [
+                "package.json",
+                "src/extension.ts",
+                "tsconfig.json"
+            ],
+            "input_files": [],
+            "deliverables": "Initialized project repository.",
+            "acceptance_criteria": "Extension compiles and runs in \"Extension Development Host\". \"Code Machine\" output channel is visible.",
+            "dependencies": [],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I1",
+        "completed": false,
+        "target_files": [
+            "package.json",
+            "src/extension.ts",
+            "tsconfig.json"
+        ],
+        "input_files": [],
+        "files": []
+    },
+    {
+        "name": "I1.T2",
+        "context": {
+            "task_id": "I1.T2",
+            "iteration_id": "I1",
+            "iteration_goal": "Initialize the project, set up the extension manifest, implement the core CLI wrapper service, and define the high-level architecture.",
+            "description": "Generate a System Component Diagram showing the Extension, Workflow Controller, CLI Wrapper, and File System interactions.",
+            "agent_type_hint": "DiagrammingAgent",
+            "inputs": "Section 2 (Core Architecture).",
+            "target_files": [
+                "docs/diagrams/system_component.puml"
+            ],
+            "input_files": [],
+            "deliverables": "PlantUML diagram file.",
+            "acceptance_criteria": "Diagram clearly separates UI, Logic, and External CLI. Renders without syntax errors.",
+            "dependencies": [],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I1",
+        "completed": false,
+        "target_files": [
+            "docs/diagrams/system_component.puml"
+        ],
+        "input_files": [],
+        "files": []
+    },
+    {
+        "name": "I1.T3",
+        "context": {
+            "task_id": "I1.T3",
+            "iteration_id": "I1",
+            "iteration_goal": "Initialize the project, set up the extension manifest, implement the core CLI wrapper service, and define the high-level architecture.",
+            "description": "Implement `CliService`. This class should handle spawning a child process, returning a Promise that resolves on exit code 0, and streaming stdout to the Output Channel. Include a `MockCli.py` in `test/mocks` that accepts arguments and sleeps/prints to simulate work.",
+            "agent_type_hint": "BackendAgent",
+            "inputs": "Requirement 5.4 (CLI Integration Wrapper).",
+            "target_files": [
+                "src/services/CliService.ts",
+                "test/mocks/mock_cli.py"
+            ],
+            "input_files": [
+                "src/extension.ts"
+            ],
+            "deliverables": "TypeScript service class and Python mock script.",
+            "acceptance_criteria": "Unit test confirms `CliService` can run `mock_cli.py` and capture output.",
+            "dependencies": [
+                "I1.T1"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I1",
+        "completed": false,
+        "target_files": [
+            "src/services/CliService.ts",
+            "test/mocks/mock_cli.py"
+        ],
+        "input_files": [
+            "src/extension.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I2.T1",
+        "context": {
+            "task_id": "I2.T1",
+            "iteration_id": "I2",
+            "iteration_goal": "Implement the Activity Bar container, the Sidebar layout, and the State Machine logic to track the project phase.",
+            "description": "Generate a State Machine Diagram defining transitions: Concept -> Specs -> Arch -> Plan -> Build. Define triggers (e.g., \"Approve Specs\").",
+            "agent_type_hint": "DiagrammingAgent",
+            "inputs": "Requirement 3.1 (Project State).",
+            "target_files": [
+                "docs/diagrams/workflow_state.mmd"
+            ],
+            "input_files": [],
+            "deliverables": "Mermaid diagram file.",
+            "acceptance_criteria": "Covers all 5 phases and \"Gating\" transitions.",
+            "dependencies": [],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I2",
+        "completed": false,
+        "target_files": [
+            "docs/diagrams/workflow_state.mmd"
+        ],
+        "input_files": [],
+        "files": []
+    },
+    {
+        "name": "I2.T2",
+        "context": {
+            "task_id": "I2.T2",
+            "iteration_id": "I2",
+            "iteration_goal": "Implement the Activity Bar container, the Sidebar layout, and the State Machine logic to track the project phase.",
+            "description": "Update `package.json` to contribute a View Container (Activity Bar) and three Views (Project State, Task Board, Artifacts). Implement a basic `WorkflowController` that holds the current phase state.",
+            "agent_type_hint": "FrontendAgent",
+            "inputs": "Requirement 3.1.",
+            "target_files": [
+                "package.json",
+                "src/controllers/WorkflowController.ts"
+            ],
+            "input_files": [
+                "package.json",
+                "docs/diagrams/workflow_state.mmd"
+            ],
+            "deliverables": "Updated manifest and controller logic.",
+            "acceptance_criteria": "The \"Code Machine\" icon appears in the sidebar. Three empty views are visible.",
+            "dependencies": [
+                "I1.T1"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I2",
+        "completed": false,
+        "target_files": [
+            "package.json",
+            "src/controllers/WorkflowController.ts"
+        ],
+        "input_files": [
+            "package.json",
+            "docs/diagrams/workflow_state.mmd"
+        ],
+        "files": []
+    },
+    {
+        "name": "I2.T3",
+        "context": {
+            "task_id": "I2.T3",
+            "iteration_id": "I2",
+            "iteration_goal": "Implement the Activity Bar container, the Sidebar layout, and the State Machine logic to track the project phase.",
+            "description": "Implement `ArtifactWatcher`. Use `vscode.workspace.createFileSystemWatcher` to monitor `artifacts/*.{md,json}`. When files change, emit an event to the `WorkflowController` to update the state (e.g., if `requirements.md` is created, move phase to Specs).",
+            "agent_type_hint": "BackendAgent",
+            "inputs": "Requirement 5.3 (Data Watching).",
+            "target_files": [
+                "src/services/ArtifactWatcher.ts"
+            ],
+            "input_files": [
+                "src/controllers/WorkflowController.ts"
+            ],
+            "deliverables": "Watcher service.",
+            "acceptance_criteria": "Creating a dummy file in `artifacts/` triggers a log message in the extension.",
+            "dependencies": [
+                "I2.T2"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I2",
+        "completed": false,
+        "target_files": [
+            "src/services/ArtifactWatcher.ts"
+        ],
+        "input_files": [
+            "src/controllers/WorkflowController.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I3.T1",
+        "context": {
+            "task_id": "I3.T1",
+            "iteration_id": "I3",
+            "iteration_goal": "Implement the Prompt Wizard (Webview) and the Architecture Preview with Mermaid rendering.",
+            "description": "Create the \"New Project\" command and Webview. The Webview should accept a Project Name and Prompt, then call `CliService` (mocked) to generate `requirements.md`.",
+            "agent_type_hint": "FrontendAgent",
+            "inputs": "Requirement 3.2 (Phase 1).",
+            "target_files": [
+                "src/views/webviews/PromptPanel.ts",
+                "src/commands/newProject.ts"
+            ],
+            "input_files": [
+                "src/services/CliService.ts"
+            ],
+            "deliverables": "Interactive Webview form.",
+            "acceptance_criteria": "Submitting the form triggers the CLI and opens `requirements.md` in the editor.",
+            "dependencies": [
+                "I1.T3"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I3",
+        "completed": false,
+        "target_files": [
+            "src/views/webviews/PromptPanel.ts",
+            "src/commands/newProject.ts"
+        ],
+        "input_files": [
+            "src/services/CliService.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I3.T2",
+        "context": {
+            "task_id": "I3.T2",
+            "iteration_id": "I3",
+            "iteration_goal": "Implement the Prompt Wizard (Webview) and the Architecture Preview with Mermaid rendering.",
+            "description": "Implement the Architecture Preview logic. Create a command that parses `architecture.md`, extracts Mermaid blocks, and renders them in a VS Code Webview Panel alongside the text.",
+            "agent_type_hint": "FrontendAgent",
+            "inputs": "Requirement 3.3 (Phase 2).",
+            "target_files": [
+                "src/views/webviews/ArchitecturePreview.ts"
+            ],
+            "input_files": [
+                "src/controllers/WorkflowController.ts"
+            ],
+            "deliverables": "Preview logic using Mermaid.js CDN or bundled library.",
+            "acceptance_criteria": "Opening a markdown file with mermaid blocks and running the command renders the diagram visually.",
+            "dependencies": [],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I3",
+        "completed": false,
+        "target_files": [
+            "src/views/webviews/ArchitecturePreview.ts"
+        ],
+        "input_files": [
+            "src/controllers/WorkflowController.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I4.T1",
+        "context": {
+            "task_id": "I4.T1",
+            "iteration_id": "I4",
+            "iteration_goal": "Implement the interactive Tree View for `todo.json` allowing visualization and manipulation of the build plan.",
+            "description": "Define the JSON Schema for `todo.json`. It must support nested iterations and tasks with status, id, and dependencies.",
+            "agent_type_hint": "BackendAgent",
+            "inputs": "Requirement 3.4 (Plan Board).",
+            "target_files": [
+                "schemas/todo_schema.json"
+            ],
+            "input_files": [],
+            "deliverables": "JSON Schema file.",
+            "acceptance_criteria": "Validates a sample `todo.json` correctly.",
+            "dependencies": [],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I4",
+        "completed": false,
+        "target_files": [
+            "schemas/todo_schema.json"
+        ],
+        "input_files": [],
+        "files": []
+    },
+    {
+        "name": "I4.T2",
+        "context": {
+            "task_id": "I4.T2",
+            "iteration_id": "I4",
+            "iteration_goal": "Implement the interactive Tree View for `todo.json` allowing visualization and manipulation of the build plan.",
+            "description": "Implement `TaskTreeProvider` implementing `vscode.TreeDataProvider`. It should read `todo.json` and render Iterations as collapsible nodes and Tasks as leaf nodes.",
+            "agent_type_hint": "FrontendAgent",
+            "inputs": "Requirement 3.4, `schemas/todo_schema.json`.",
+            "target_files": [
+                "src/views/sidebar/TaskTreeProvider.ts"
+            ],
+            "input_files": [
+                "schemas/todo_schema.json"
+            ],
+            "deliverables": "Tree View implementation.",
+            "acceptance_criteria": "The \"Task Board\" view in the sidebar populates with data from a sample `todo.json`.",
+            "dependencies": [
+                "I4.T1"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I4",
+        "completed": false,
+        "target_files": [
+            "src/views/sidebar/TaskTreeProvider.ts"
+        ],
+        "input_files": [
+            "schemas/todo_schema.json"
+        ],
+        "files": []
+    },
+    {
+        "name": "I4.T3",
+        "context": {
+            "task_id": "I4.T3",
+            "iteration_id": "I4",
+            "iteration_goal": "Implement the interactive Tree View for `todo.json` allowing visualization and manipulation of the build plan.",
+            "description": "Implement \"Approve Plan\" command. This updates the `WorkflowController` state to \"Build\" and enables the execution controls.",
+            "agent_type_hint": "BackendAgent",
+            "inputs": "Requirement 3.4 (Approval).",
+            "target_files": [
+                "src/commands/approvePlan.ts"
+            ],
+            "input_files": [
+                "src/controllers/WorkflowController.ts"
+            ],
+            "deliverables": "Command registration.",
+            "acceptance_criteria": "Clicking approve changes the status indicator in the sidebar.",
+            "dependencies": [
+                "I2.T2"
+            ],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I4",
+        "completed": false,
+        "target_files": [
+            "src/commands/approvePlan.ts"
+        ],
+        "input_files": [
+            "src/controllers/WorkflowController.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I5.T1",
+        "context": {
+            "task_id": "I5.T1",
+            "iteration_id": "I5",
+            "iteration_goal": "Implement the granular execution of tasks using the CLI and basic Git integration.",
+            "description": "Generate a Sequence Diagram for the Build Loop. Show: User clicks \"Run Task\" -> Extension calls CLI -> CLI writes code -> Extension calls Git -> Extension opens Diff.",
+            "agent_type_hint": "DiagrammingAgent",
+            "inputs": "Requirement 3.5 (Iterative Build).",
+            "target_files": [
+                "docs/diagrams/build_loop_sequence.puml"
+            ],
+            "input_files": [],
+            "deliverables": "PlantUML sequence diagram.",
+            "acceptance_criteria": "Clearly shows the interaction between `CliService` and `GitService`.",
+            "dependencies": [],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I5",
+        "completed": false,
+        "target_files": [
+            "docs/diagrams/build_loop_sequence.puml"
+        ],
+        "input_files": [],
+        "files": []
+    },
+    {
+        "name": "I5.T2",
+        "context": {
+            "task_id": "I5.T2",
+            "iteration_id": "I5",
+            "iteration_goal": "Implement the granular execution of tasks using the CLI and basic Git integration.",
+            "description": "Implement `GitService`. Wrapper around `simple-git` or shell commands. Needs methods: `commit(msg)`, `resetHard()`, `getDiff()`, `init()`.",
+            "agent_type_hint": "BackendAgent",
+            "inputs": "Requirement 4.5.",
+            "target_files": [
+                "src/services/GitService.ts"
+            ],
+            "input_files": [],
+            "deliverables": "Git service class.",
+            "acceptance_criteria": "Unit tests verify it can commit and reset a test repo.",
+            "dependencies": [],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I5",
+        "completed": false,
+        "target_files": [
+            "src/services/GitService.ts"
+        ],
+        "input_files": [],
+        "files": []
+    },
+    {
+        "name": "I5.T3",
+        "context": {
+            "task_id": "I5.T3",
+            "iteration_id": "I5",
+            "iteration_goal": "Implement the granular execution of tasks using the CLI and basic Git integration.",
+            "description": "Implement `runTask` command. It should take a `taskId`, call `CliService.run(taskId)`, and upon success, trigger `GitService` to stage changes (but not commit yet, or commit to a temp branch depending on strategy).",
+            "agent_type_hint": "BackendAgent",
+            "inputs": "Requirement 5.4.",
+            "target_files": [
+                "src/controllers/BuildController.ts"
+            ],
+            "input_files": [
+                "src/services/CliService.ts",
+                "src/services/GitService.ts"
+            ],
+            "deliverables": "Logic to run a specific task.",
+            "acceptance_criteria": "Running a task triggers the mock CLI and results in a git status change.",
+            "dependencies": [
+                "I1.T3",
+                "I5.T2"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I5",
+        "completed": false,
+        "target_files": [
+            "src/controllers/BuildController.ts"
+        ],
+        "input_files": [
+            "src/services/CliService.ts",
+            "src/services/GitService.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I6.T1",
+        "context": {
+            "task_id": "I6.T1",
+            "iteration_id": "I6",
+            "iteration_goal": "Implement the \"Diff Review\" UI (Accept/Reject/Retry) and the QA status visualization.",
+            "description": "Implement the \"Diff View\" trigger. When a task finishes, use `vscode.commands.executeCommand('git.openChange', ...)` to show the diff of the generated files.",
+            "agent_type_hint": "FrontendAgent",
+            "inputs": "Requirement 3.5.",
+            "target_files": [
+                "src/controllers/ReviewController.ts"
+            ],
+            "input_files": [
+                "src/controllers/BuildController.ts"
+            ],
+            "deliverables": "Logic to open the native VS Code diff editor.",
+            "acceptance_criteria": "After `runTask` completes, the editor splits and shows the diff.",
+            "dependencies": [
+                "I5.T3"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I6",
+        "completed": false,
+        "target_files": [
+            "src/controllers/ReviewController.ts"
+        ],
+        "input_files": [
+            "src/controllers/BuildController.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I6.T2",
+        "context": {
+            "task_id": "I6.T2",
+            "iteration_id": "I6",
+            "iteration_goal": "Implement the \"Diff Review\" UI (Accept/Reject/Retry) and the QA status visualization.",
+            "description": "Implement \"Accept\" and \"Reject\" commands. \"Accept\" marks the task done in `todo.json`. \"Reject\" calls `GitService.resetHard()` and prompts the user for feedback (Input Box), then re-triggers `CliService` with the feedback.",
+            "agent_type_hint": "BackendAgent",
+            "inputs": "Requirement 3.5 (The Diff UX).",
+            "target_files": [
+                "src/commands/reviewCommands.ts"
+            ],
+            "input_files": [
+                "src/controllers/ReviewController.ts",
+                "src/services/GitService.ts"
+            ],
+            "deliverables": "Command logic for review actions.",
+            "acceptance_criteria": "Rejecting reverts the file system to pre-task state.",
+            "dependencies": [
+                "I6.T1"
+            ],
+            "parallelizable": false
+        },
+        "output": null,
+        "iteration_id": "I6",
+        "completed": false,
+        "target_files": [
+            "src/commands/reviewCommands.ts"
+        ],
+        "input_files": [
+            "src/controllers/ReviewController.ts",
+            "src/services/GitService.ts"
+        ],
+        "files": []
+    },
+    {
+        "name": "I6.T3",
+        "context": {
+            "task_id": "I6.T3",
+            "iteration_id": "I6",
+            "iteration_goal": "Implement the \"Diff Review\" UI (Accept/Reject/Retry) and the QA status visualization.",
+            "description": "Implement QA Status Badges. Update `TaskTreeProvider` to read `logs/<taskId>.log` (mocked) or CLI exit codes to determine status (Green/Red). Add decoration to the TreeItem.",
+            "agent_type_hint": "FrontendAgent",
+            "inputs": "Requirement 3.6 (QA Dashboard).",
+            "target_files": [
+                "src/views/sidebar/TaskTreeProvider.ts"
+            ],
+            "input_files": [
+                "src/views/sidebar/TaskTreeProvider.ts"
+            ],
+            "deliverables": "Visual badges on tree items.",
+            "acceptance_criteria": "Tasks show checkmarks or X icons based on status in `todo.json`.",
+            "dependencies": [
+                "I4.T2"
+            ],
+            "parallelizable": true
+        },
+        "output": null,
+        "iteration_id": "I6",
+        "completed": false,
+        "target_files": [
+            "src/views/sidebar/TaskTreeProvider.ts"
+        ],
+        "input_files": [
+            "src/views/sidebar/TaskTreeProvider.ts"
+        ],
+        "files": []
+    }
+]
