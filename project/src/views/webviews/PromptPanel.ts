@@ -129,7 +129,7 @@ export class PromptPanel {
         this._panel.webview.html = this._getHtmlForWebview(webview);
     }
 
-    private _getHtmlForWebview(webview: vscode.Webview) {
+    private _getHtmlForWebview(_webview: vscode.Webview) {
         // Use a nonce to only allow specific scripts to be run
         const nonce = getNonce();
 
