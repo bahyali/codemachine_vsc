@@ -4,24 +4,7 @@ import * as path from 'path';
 import { BuildController } from '../controllers/BuildController';
 import { GitService } from '../services/GitService';
 
-// Type definitions based on schemas/todo_schema.json
-interface Task {
-    id: string;
-    description: string;
-    status: 'pending' | 'done' | 'failed';
-    dependencies?: string[];
-    file_paths?: string[];
-}
-
-interface Iteration {
-    iteration_id: string;
-    description?: string;
-    status: 'pending' | 'in-progress' | 'completed';
-    tasks?: Task[];
-    iterations?: Iteration[];
-}
-
-type TodoPlan = Iteration[];
+import { Iteration, TodoPlan } from '../models/task';
 
 /**
  * Recursively searches for a task by its ID in a nested structure of iterations and updates its status.
