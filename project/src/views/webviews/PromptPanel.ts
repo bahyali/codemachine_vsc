@@ -66,12 +66,13 @@ export class PromptPanel {
     }
 
     private async handleSubmit(projectName: string, prompt: string) {
-        if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders || workspaceFolders.length === 0) {
             vscode.window.showErrorMessage('Please open a workspace folder to create a new project.');
             return;
         }
-
-        const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const workspaceFolder = workspaceFolders[0];
+        const workspaceRoot = workspaceFolder.uri.fsPath;
         const outputChannel = vscode.window.createOutputChannel('Code Machine');
         const cliService = new CliService();
 
@@ -94,7 +95,7 @@ export class PromptPanel {
                 this.dispose();
 
                 // Open the requirements.md file
-                const requirementsPath = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'requirements.md');
+                const requirementsPath = vscode.Uri.joinPath(workspaceFolder.uri, 'requirements.md');
                 const document = await vscode.workspace.openTextDocument(requirementsPath);
                 await vscode.window.showTextDocument(document);
 
