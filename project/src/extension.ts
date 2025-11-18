@@ -3,6 +3,7 @@ import { WorkflowController, Phase } from './controllers/WorkflowController';
 import { ArtifactWatcher } from './services/ArtifactWatcher';
 import { registerNewProjectCommand } from './commands/newProject';
 import { registerShowArchitecturePreviewCommand } from './commands/showArchitecturePreview';
+import { TaskTreeProvider } from './views/sidebar/TaskTreeProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('Code Machine');
@@ -15,11 +16,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const artifactWatcher = new ArtifactWatcher(workflowController, outputChannel);
 
+	// Register Tree View
+	const taskTreeProvider = new TaskTreeProvider();
+	const taskBoardView = vscode.window.registerTreeDataProvider('codeMachine.taskBoard', taskTreeProvider);
+
 	// Register commands
 	registerNewProjectCommand(context);
 	registerShowArchitecturePreviewCommand(context);
 
-	context.subscriptions.push(outputChannel, artifactWatcher);
+	context.subscriptions.push(outputChannel, artifactWatcher, taskBoardView);
 }
 
 export function deactivate() {}
