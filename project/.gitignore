@@ -1,21 +1,39 @@
-# Dependencies
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# Build output
+# testing
+/coverage
+
+# production
 /out
 /dist
 /build
 
-# VS Code specific
-.vscode-test/
-*.vsix
+# misc
+.DS_Store
+*.pem
 
-# Logs
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Misc
-.DS_Store
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+/out/
+
+# vs code
+.vscode/
+.vscode-test/
+*.vsix

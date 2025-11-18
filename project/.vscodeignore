@@ -1,7 +1,11 @@
 .vscode/**
 .vscode-test/**
-node_modules/**
 out/test/**
-src/**
+src/test/**
 .eslintrc.js
+.gitignore
 tsconfig.json
+package-lock.json
+**/.git/**
+**/.DS_Store
+**/node_modules
