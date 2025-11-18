@@ -1,9 +1,7 @@
-# Folders
-.vscode/
-node_modules/
-out/test/
-
-# Files
-.gitignore
+.vscode/**
+.vscode-test/**
+node_modules/**
+out/test/**
+src/**
 .eslintrc.js
 tsconfig.json

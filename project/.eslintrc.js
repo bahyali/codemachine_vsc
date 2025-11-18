@@ -1,3 +1,4 @@
+/**@type {import('eslint').Linter.Config}*/
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
@@ -8,21 +9,10 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
   ],
-  env: {
-    node: true,
-    es6: true
-  },
   rules: {
-    'semi': ['error', 'always'],
-    '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
-    '@typescript-eslint/no-explicit-any': 'off',
-  },
-  overrides: [
-    {
-      files: ['src/test/suite/**/*.ts'],
-      env: {
-        mocha: true
-      }
-    }
-  ]
+    'semi': [2, "always"],
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+  }
 };
