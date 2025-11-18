@@ -6,6 +6,8 @@ export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('Code Machine');
 	outputChannel.appendLine('Code Machine Orchestrator activated.');
 	outputChannel.show(true); // Passing true preserves focus on the editor
+
+	context.subscriptions.push(outputChannel);
 }
 
 export function deactivate() {}

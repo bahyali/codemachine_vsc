@@ -1,0 +1,9 @@
+# Folders
+.vscode/
+node_modules/
+out/test/
+
+# Files
+.gitignore
+.eslintrc.js
+tsconfig.json
