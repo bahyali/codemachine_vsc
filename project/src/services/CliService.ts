@@ -8,13 +8,17 @@ export class CliService {
      * @param command The command to execute (e.g., 'python').
      * @param args An array of string arguments.
      * @param outputChannel The VS Code output channel to stream stdout and stderr to.
+     * @param cwd The working directory to run the command in.
      * @returns A promise that resolves if the command exits with code 0, and rejects otherwise.
      */
-    public execute(command: string, args: string[], outputChannel: vscode.OutputChannel): Promise<void> {
+    public execute(command: string, args: string[], outputChannel: vscode.OutputChannel, cwd?: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
+            if (cwd) {
+                outputChannel.appendLine(`> Working directory: ${cwd}`);
+            }
             outputChannel.appendLine(`> Running command: ${command} ${args.join(' ')}`);
 
-            const child = spawn(command, args);
+            const child = spawn(command, args, { cwd });
 
             // Stream stdout
             if (child.stdout) {

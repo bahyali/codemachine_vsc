@@ -11,10 +11,17 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onCommand:codemachine.newProject"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "codemachine.newProject",
+        "title": "Code Machine: New Project"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {

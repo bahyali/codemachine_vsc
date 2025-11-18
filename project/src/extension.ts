@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { WorkflowController, Phase } from './controllers/WorkflowController';
 import { ArtifactWatcher } from './services/ArtifactWatcher';
+import { registerNewProjectCommand } from './commands/newProject';
 
 export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('Code Machine');
@@ -12,6 +13,9 @@ export function activate(context: vscode.ExtensionContext) {
 	outputChannel.appendLine(`Workflow initialized in phase: ${Phase[workflowController.currentPhase]}`);
 
 	const artifactWatcher = new ArtifactWatcher(workflowController, outputChannel);
+
+	// Register commands
+	registerNewProjectCommand(context);
 
 	context.subscriptions.push(outputChannel, artifactWatcher);
 }
