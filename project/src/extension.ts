@@ -3,6 +3,7 @@ import { WorkflowController, Phase } from './controllers/WorkflowController';
 import { ArtifactWatcher } from './services/ArtifactWatcher';
 import { registerNewProjectCommand } from './commands/newProject';
 import { registerShowArchitecturePreviewCommand } from './commands/showArchitecturePreview';
+import { registerApprovePlanCommand } from './commands/approvePlan';
 import { TaskTreeProvider } from './views/sidebar/TaskTreeProvider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -13,6 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const workflowController = new WorkflowController(outputChannel);
 	outputChannel.appendLine(`Workflow initialized in phase: ${Phase[workflowController.currentPhase]}`);
+	vscode.window.setContext('codeMachine.phase', Phase[workflowController.currentPhase]);
 
 	// Register Tree View
 	const taskTreeProvider = new TaskTreeProvider();
@@ -23,6 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// Register commands
 	registerNewProjectCommand(context);
 	registerShowArchitecturePreviewCommand(context);
+	registerApprovePlanCommand(context, workflowController);
 
 	context.subscriptions.push(outputChannel, artifactWatcher, taskBoardView);
 }

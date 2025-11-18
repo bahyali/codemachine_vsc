@@ -13,7 +13,8 @@
   "activationEvents": [
     "onStartupFinished",
     "onCommand:codemachine.newProject",
-    "onCommand:codemachine.showArchitecturePreview"
+    "onCommand:codemachine.showArchitecturePreview",
+    "onCommand:codemachine.approvePlan"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -25,6 +26,10 @@
       {
         "command": "codemachine.showArchitecturePreview",
         "title": "Code Machine: Show Architecture Preview"
+      },
+      {
+        "command": "codemachine.approvePlan",
+        "title": "Code Machine: Approve Plan"
       }
     ],
     "viewsContainers": {
