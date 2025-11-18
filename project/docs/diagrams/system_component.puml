@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title System Component Diagram for Code Machine Orchestrator
+
+System_Boundary(extension_boundary, "Code Machine Extension") {
+    
+    Container(ui_layer, "UI Components", "VS Code API / Webviews", "Sidebar, TreeView, Prompt Wizard, Diagram Preview.")
+    
+    Container(controller, "Workflow Controller", "TypeScript Class", "Orchestrates the state machine (Specs -> Arch -> Plan -> Build).")
+    
+    Container(cli_wrapper, "CLI Wrapper Service", "TypeScript / child_process", "Manages Python process lifecycle, parses stdout/stderr.")
+    
+    Container(fs_watcher, "State Monitor", "VS Code FileSystemWatcher", "Watches artifacts/ folder for changes to update UI.")
+    
+    Container(git_service, "Git Integration", "TypeScript / SimpleGit", "Handles commits, reverts, and diff staging.")
+}
+
+ContainerDb(artifacts, "Project Artifacts", "JSON / Markdown", "todo.json, requirements.md, architecture.md")
+Container(external_cli, "Python CLI Process", "Python", "Executes generation logic.")
+
+Rel(ui_layer, controller, "Sends User Actions")
+Rel(controller, ui_layer, "Updates View State")
+
+Rel(controller, cli_wrapper, "Triggers Commands")
+Rel(cli_wrapper, external_cli, "Spawns process", "Shell")
+
+Rel(controller, git_service, "Requests Diff/Revert")
+Rel(git_service, artifacts, "Git Operations")
+
+Rel(external_cli, artifacts, "Writes")
+Rel(fs_watcher, artifacts, "Observes")
+Rel(fs_watcher, controller, "Triggers Refresh")
+
+@enduml
