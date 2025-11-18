@@ -11,14 +11,14 @@ suite('GitService Test Suite', () => {
     let rawGit: SimpleGit; // For verification purposes
 
     // Create a temporary directory for a new git repo before each test
-    beforeEach(async () => {
+    setup(async () => {
         testRepoPath = await fs.mkdtemp(path.join(tmpdir(), 'codemachine-gitservice-test-'));
         gitService = new GitService(testRepoPath);
         rawGit = simpleGit(testRepoPath);
     });
 
     // Clean up the temporary directory after each test
-    afterEach(async () => {
+    teardown(async () => {
         if (testRepoPath) {
             await fs.rm(testRepoPath, { recursive: true, force: true });
         }
