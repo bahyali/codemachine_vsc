@@ -1,0 +1,42 @@
+@startuml
+title Build & Review Loop Sequence
+
+actor User
+participant "VS Code Extension" as Ext
+participant "CliService" as CLI_Service
+participant "Python CLI" as CLI_Process
+participant "GitService" as GIT_Service
+database "File System / Git Repo" as FS
+
+User -> Ext: Clicks 'Run Task'
+activate Ext
+
+group CLI Execution
+    Ext -> CLI_Service: executeTask(taskId)
+    activate CLI_Service
+
+    CLI_Service -> CLI_Process: spawn('cli.py --step <taskId>')
+    activate CLI_Process
+
+    CLI_Process -> FS: Writes/Modifies code files
+    CLI_Process --> CLI_Service: Exits with code 0
+    deactivate CLI_Process
+
+    CLI_Service --> Ext: Promise resolves (Success)
+    deactivate CLI_Service
+end
+
+group Git & Review
+    Ext -> GIT_Service: commitChanges('Task <taskId> complete')
+    activate GIT_Service
+
+    GIT_Service -> FS: git add .; git commit
+    GIT_Service --> Ext: Promise resolves (Success)
+    deactivate GIT_Service
+
+    Ext -> Ext: vscode.commands.execute('git.openChange', ...)
+    Ext -> User: Shows side-by-side Diff View
+end
+deactivate Ext
+
+@enduml
