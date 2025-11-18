@@ -1,0 +1,10 @@
+stateDiagram-v2
+    direction LR
+
+    [*] --> Concept: Start New Project
+
+    Concept --> Specs: Generate Specs
+    Specs --> Arch: Approve & Lock Specs
+    Arch --> Plan: Approve Architecture
+    Plan --> Build: Approve Plan
+    Build --> [*]: Finish
