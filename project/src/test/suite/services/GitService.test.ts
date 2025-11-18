@@ -95,4 +95,40 @@ suite('GitService Test Suite', () => {
         assert.ok(diff.includes('diff --git a/test.txt b/test.txt'), 'Diff header should be present');
         assert.ok(diff.includes('+line 2'), 'Diff should show the added line');
     });
+
+    test('getStagedChanges should return staged files', async () => {
+        await gitService.init();
+        const file1 = 'file1.txt';
+        const file2 = 'file2.txt';
+        const file3 = 'file3.txt';
+
+        // No staged changes initially
+        let staged = await gitService.getStagedChanges();
+        assert.deepStrictEqual(staged, [], 'Should be no staged changes initially');
+
+        // Stage one new file
+        await fs.writeFile(path.join(testRepoPath, file1), 'content1');
+        await rawGit.add(file1);
+        staged = await gitService.getStagedChanges();
+        assert.deepStrictEqual(staged, [file1], 'Should list one staged file');
+
+        // Stage another new file
+        await fs.writeFile(path.join(testRepoPath, file2), 'content2');
+        await rawGit.add(file2);
+        staged = await gitService.getStagedChanges();
+        // The order is not guaranteed, so we sort.
+        assert.deepStrictEqual(staged.sort(), [file1, file2].sort(), 'Should list two staged files');
+
+        // Commit and stage a modification
+        await gitService.commit('Initial commit');
+        await fs.appendFile(path.join(testRepoPath, file1), ' more content');
+        await rawGit.add(file1);
+        staged = await gitService.getStagedChanges();
+        assert.deepStrictEqual(staged, [file1], 'Should list one modified staged file');
+        
+        // Add a new file but don't stage it
+        await fs.writeFile(path.join(testRepoPath, file3), 'content3');
+        staged = await gitService.getStagedChanges();
+        assert.deepStrictEqual(staged, [file1], 'Should not list unstaged files');
+    });
 });
