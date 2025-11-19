@@ -15,9 +15,16 @@ export class PromptPanel {
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionUri: vscode.Uri;
     private readonly _outputChannel: vscode.OutputChannel;
+    private readonly _pythonCommand: string;
+    private readonly _pythonFallback: string[];
     private _disposables: vscode.Disposable[] = [];
 
-    public static createOrShow(extensionUri: vscode.Uri, outputChannel: vscode.OutputChannel) {
+    public static createOrShow(
+        extensionUri: vscode.Uri,
+        outputChannel: vscode.OutputChannel,
+        pythonCommand: string,
+        pythonFallback: string[],
+    ) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
@@ -40,13 +47,21 @@ export class PromptPanel {
             }
         );
 
-        PromptPanel.currentPanel = new PromptPanel(panel, extensionUri, outputChannel);
+        PromptPanel.currentPanel = new PromptPanel(panel, extensionUri, outputChannel, pythonCommand, pythonFallback);
     }
 
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, outputChannel: vscode.OutputChannel) {
+    private constructor(
+        panel: vscode.WebviewPanel,
+        extensionUri: vscode.Uri,
+        outputChannel: vscode.OutputChannel,
+        pythonCommand: string,
+        pythonFallback: string[],
+    ) {
         this._panel = panel;
         this._extensionUri = extensionUri;
         this._outputChannel = outputChannel;
+        this._pythonCommand = pythonCommand;
+        this._pythonFallback = pythonFallback;
 
         // Set the webview's initial html content
         this._update();
@@ -87,13 +102,12 @@ export class PromptPanel {
         }, async (progress) => {
             progress.report({ increment: 0, message: "Starting CLI..." });
             try {
-                // This path assumes the mock CLI from I1.T3 is located in `test/mocks/`.
-                const cliPath = path.join(this._extensionUri.fsPath, 'test', 'mocks', 'mock_cli.py');
+                const cliPath = path.join(this._extensionUri.fsPath, 'tools', 'cli', 'codemachine_cli.py');
                 
                 // The mock CLI needs to create `requirements.md` in the `cwd`.
                 this._outputChannel.show(true);
                 await cliService.execute(
-                    'python',
+                    this._pythonCommand,
                     [
                         cliPath,
                         'generate',
@@ -106,7 +120,7 @@ export class PromptPanel {
                     ],
                     this._outputChannel,
                     workspaceRoot,
-                    { fallbackCommands: ['python3', 'py'] },
+                    { fallbackCommands: this._pythonFallback },
                 );
                 
                 progress.report({ increment: 100, message: "Requirements generated." });

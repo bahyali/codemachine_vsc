@@ -1,13 +1,42 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { WorkflowController, Phase } from '../controllers/WorkflowController';
-import { ARTIFACTS_DIR, ARCHITECTURE_FILENAME, REQUIREMENTS_FILENAME, TODO_FILENAME } from '../constants';
+import { ARTIFACTS_DIR, ARCHITECTURE_FILENAME, PLAN_FILENAME, REQUIREMENTS_FILENAME, TODO_FILENAME } from '../constants';
+import { CliService } from '../services/CliService';
 
 async function artifactExists(filename: string): Promise<boolean> {
     const files = await vscode.workspace.findFiles(`**/${ARTIFACTS_DIR}/${filename}`, '**/node_modules/**', 1);
     return files.length > 0;
 }
 
-export function registerApprovalCommands(context: vscode.ExtensionContext, workflowController: WorkflowController) {
+interface ApprovalDependencies {
+    outputChannel: vscode.OutputChannel;
+    extensionPath: string;
+    pythonCommand: string;
+    pythonFallback: string[];
+}
+
+function getWorkspaceInfo() {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+        return undefined;
+    }
+    const folder = workspaceFolders[0];
+    return {
+        root: folder.uri.fsPath,
+        uri: folder.uri.toString(),
+        name: folder.name,
+    };
+}
+
+export function registerApprovalCommands(
+    context: vscode.ExtensionContext,
+    workflowController: WorkflowController,
+    deps: ApprovalDependencies,
+) {
+    const cliService = new CliService();
+    const cliPath = path.join(deps.extensionPath, 'tools', 'cli', 'codemachine_cli.py');
+
     const approveRequirements = vscode.commands.registerCommand('codemachine.approveRequirements', async () => {
         if (workflowController.currentPhase !== Phase.Specs) {
             vscode.window.showWarningMessage('You must be in the Specs phase to approve requirements.');
@@ -44,8 +73,42 @@ export function registerApprovalCommands(context: vscode.ExtensionContext, workf
             return;
         }
 
+        if (!(await artifactExists(PLAN_FILENAME))) {
+            vscode.window.showErrorMessage('No plan.md file found in .artifacts. Generate the plan before approving.');
+            return;
+        }
+
+        const workspaceInfo = getWorkspaceInfo();
+        if (!workspaceInfo) {
+            vscode.window.showErrorMessage('Open a workspace folder to approve the plan.');
+            return;
+        }
+
+        deps.outputChannel.show(true);
+        try {
+            await cliService.execute(
+                deps.pythonCommand,
+                [
+                    cliPath,
+                    'extract-plan',
+                    '--project-name',
+                    workspaceInfo.name,
+                    '--workspace-uri',
+                    workspaceInfo.uri,
+                    '--force',
+                ],
+                deps.outputChannel,
+                workspaceInfo.root,
+                { fallbackCommands: deps.pythonFallback },
+            );
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Failed to convert plan to todo.json: ${message}`);
+            return;
+        }
+
         if (!(await artifactExists(TODO_FILENAME))) {
-            vscode.window.showErrorMessage('No todo.json file found in .artifacts. Generate the plan before approving.');
+            vscode.window.showErrorMessage('Plan extraction did not produce todo.json. Check CLI output for details.');
             return;
         }
 

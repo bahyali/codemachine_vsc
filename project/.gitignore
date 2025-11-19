@@ -36,3 +36,6 @@ yarn-error.log*
 .vscode-test/
 .vscode-test-web/
 *.vsix
+
+# python virtual environment
+.venv

@@ -7,7 +7,15 @@
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "npm: compile"
+      "preLaunchTask": "npm: compile",
+      "env": {
+        "CODEMACHINE_CLI_MODE": "real",
+        "CODEMACHINE_LLM_MODEL": "gpt-4o-mini",
+        "CODEMACHINE_LLM_API_KEY": "REPLACE_WITH_API_KEY",
+        "CODEMACHINE_LLM_API_BASE": "",
+        "CODEMACHINE_PYTHON":"${workspaceFolder}/tools/cli/.venv/bin/python"
+
+      }
     },
     {
       "name": "Extension Tests",
@@ -18,7 +26,13 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "npm: compile"
+      "preLaunchTask": "npm: compile",
+      "env": {
+        "CODEMACHINE_CLI_MODE": "mock",
+        "CODEMACHINE_LLM_MODEL": "gpt-4o-mini",
+        "CODEMACHINE_LLM_API_KEY": "REPLACE_WITH_API_KEY",
+        "CODEMACHINE_LLM_API_BASE": ""
+      }
     }
   ]
 }

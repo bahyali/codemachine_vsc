@@ -21,6 +21,9 @@ export function activate(context: vscode.ExtensionContext) {
 	outputChannel.show(true);
 
 	const workflowController = new WorkflowController(outputChannel, context.workspaceState);
+	const pythonCommandOverride = process.env.CODEMACHINE_PYTHON;
+	const primaryPython = pythonCommandOverride ?? 'python';
+	const fallbackCommands = pythonCommandOverride ? ['python', 'python3', 'py'] : ['python3', 'py'];
 	outputChannel.appendLine(`Workflow initialized in phase: ${Phase[workflowController.currentPhase]}`);
 	vscode.commands.executeCommand('setContext', 'codeMachine.phase', Phase[workflowController.currentPhase]);
 
@@ -36,9 +39,14 @@ export function activate(context: vscode.ExtensionContext) {
 	const phaseListener = workflowController.onDidPhaseChange(() => taskTreeProvider.refresh());
 
 	// Register commands
-	registerNewProjectCommand(context, outputChannel);
+	registerNewProjectCommand(context, outputChannel, primaryPython, fallbackCommands);
 	registerShowArchitecturePreviewCommand(context);
-    registerApprovalCommands(context, workflowController);
+	registerApprovalCommands(context, workflowController, {
+		outputChannel,
+		extensionPath: context.extensionUri.fsPath,
+		pythonCommand: primaryPython,
+		pythonFallback: fallbackCommands,
+	});
 
 	const cliService = new CliService();
 	let workspaceServices: ReviewDependencies | undefined;
@@ -63,6 +71,8 @@ export function activate(context: vscode.ExtensionContext) {
 			workspaceRoot,
 			reviewController,
 			context.extensionUri.fsPath,
+			primaryPython,
+			fallbackCommands,
 		);
 
 		workspaceServices = { workspaceRoot, gitService, buildController };

@@ -7,6 +7,8 @@ import { CliService } from '../../../services/CliService';
 import { EOL } from 'os';
 import { ARTIFACTS_DIR, ARCHITECTURE_FILENAME, PLAN_FILENAME, REQUIREMENTS_FILENAME, TODO_FILENAME } from '../../../constants';
 
+process.env.CODEMACHINE_CLI_MODE = 'mock';
+
 suite('CliService Test Suite', () => {
     let cliService: CliService;
     let mockOutputChannel: vscode.OutputChannel;
@@ -14,8 +16,8 @@ suite('CliService Test Suite', () => {
     let workspaceDir: string;
     let workspaceUri: string;
 
-    // Resolve path from out/test/suite/services -> project root -> test/mocks
-    const mockCliPath = path.resolve(__dirname, '../../../../test/mocks/mock_cli.py');
+    // Resolve path from out/test/suite/services -> project root -> tools/cli
+    const cliPath = path.resolve(__dirname, '../../../../tools/cli/codemachine_cli.py');
 
     setup(async () => {
         output = '';
@@ -42,7 +44,7 @@ suite('CliService Test Suite', () => {
         await cliService.execute(
             'python3',
             [
-                mockCliPath,
+                cliPath,
                 'generate',
                 '--project-name',
                 'Demo Project',
@@ -73,7 +75,7 @@ suite('CliService Test Suite', () => {
         ]);
 
         assert.ok(output.includes('> Running command: python3'), 'Should log the command being run');
-        assert.ok(output.includes('Mock CLI: wrote'), 'Should stream CLI output');
+        assert.ok(output.includes('LLM mode: mock'), 'Should log mock mode');
         assert.ok(output.includes('> Command finished with exit code 0.'), 'Should log successful exit code');
     });
 
@@ -83,7 +85,7 @@ suite('CliService Test Suite', () => {
                 await cliService.execute(
                     'python3',
                     [
-                        mockCliPath,
+                        cliPath,
                         'generate',
                         '--project-name',
                         'Failing Project',
@@ -103,7 +105,7 @@ suite('CliService Test Suite', () => {
             'Promise should have been rejected'
         );
 
-        assert.ok(output.includes('Mock CLI: Simulating failure.'), 'Should capture failure message');
+        assert.ok(output.includes('Failure requested via --fail.'), 'Should capture failure message');
         assert.ok(output.includes('> Command failed with exit code 1.'), 'Should log failure exit code');
     });
 
@@ -127,7 +129,7 @@ suite('CliService Test Suite', () => {
     test('should try fallback command when primary executable is missing', async () => {
         const nonExistentCommand = 'this_command_does_not_exist_67890';
         const args = [
-            mockCliPath,
+            cliPath,
             'generate',
             '--project-name',
             'Fallback Project',

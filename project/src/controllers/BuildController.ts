@@ -14,6 +14,8 @@ export class BuildController {
         private readonly workspaceRoot: string,
         private readonly reviewController: ReviewController,
         private readonly extensionPath: string,
+        private readonly pythonCommand: string,
+        private readonly pythonFallback: string[],
     ) {}
 
     public getCurrentTaskId(): string | undefined {
@@ -30,7 +32,7 @@ export class BuildController {
             this.outputChannel.appendLine(`> With feedback: ${feedback}`);
         }
         try {
-            const cliPath = path.join(this.extensionPath, 'test', 'mocks', 'mock_cli.py');
+            const cliPath = path.join(this.extensionPath, 'tools', 'cli', 'codemachine_cli.py');
             const workspaceUri = vscode.Uri.file(this.workspaceRoot).toString();
             const args = ['run', '--task-id', taskId, '--workspace-uri', workspaceUri];
             if (feedback) {
@@ -40,11 +42,11 @@ export class BuildController {
             }
 
             await this.cliService.execute(
-                'python',
+                this.pythonCommand,
                 [cliPath, ...args],
                 this.outputChannel,
                 this.workspaceRoot,
-                { fallbackCommands: ['python3', 'py'] },
+                { fallbackCommands: this.pythonFallback },
             );
             
             this.outputChannel.appendLine(`Task ${taskId} completed successfully.`);
