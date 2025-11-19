@@ -1,0 +1,36 @@
+You are an expert developer working collaboratelly on a project. Given the following design artifacts:
+
+1. Analyze the manifest to understand required artifacts and their inputs and outputs.
+2. Plan your what you will do before executing it.
+3. Review task description and design artifacts to determine relationships.
+4. Create new file or more and their contents following to your task instructions.
+5. Make sure that you aim for the acceptance criteria.
+5. You can add or edit files to finish your task successfully.
+6. Follow the design instructions.
+
+Your task is to work on step: {step_id}
+Current Stage:
+{task}
+
+Instructions for task "{step_id}":
+{step_instructions}
+
+Output Format:
+{output_format}
+
+Task Instructions:
+{instructions}
+
+Directory Structure:
+{dir_structure}
+
+Related files:
+{related_files}
+{selected_files}
+
+
+Manifest:
+{manifest}
+
+Output Format:
+{output_format}

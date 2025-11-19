@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { WorkflowController, Phase } from './controllers/WorkflowController';
 import { ArtifactWatcher } from './services/ArtifactWatcher';
 import { registerNewProjectCommand } from './commands/newProject';
@@ -13,6 +14,7 @@ import { BuildController } from './controllers/BuildController';
 import { CliService } from './services/CliService';
 import { GitService } from './services/GitService';
 import { ReviewController } from './controllers/ReviewController';
+import { CliInvoker } from './models/CliInvoker';
 
 export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('Code Machine');
@@ -21,9 +23,15 @@ export function activate(context: vscode.ExtensionContext) {
 	outputChannel.show(true);
 
 	const workflowController = new WorkflowController(outputChannel, context.workspaceState);
-	const pythonCommandOverride = process.env.CODEMACHINE_PYTHON;
-	const primaryPython = pythonCommandOverride ?? 'python';
-	const fallbackCommands = pythonCommandOverride ? ['python', 'python3', 'py'] : ['python3', 'py'];
+	const nodeCommandOverride = process.env.CODEMACHINE_NODE;
+	const bridgeCommand = nodeCommandOverride ?? 'node';
+	const bridgeFallbacks = nodeCommandOverride ? ['node'] : ['node', 'nodejs'];
+	const cliBridgeScript = path.join(context.extensionUri.fsPath, 'tools', 'bridge', 'cliBridge.js');
+	const cliInvoker: CliInvoker = {
+		command: bridgeCommand,
+		fallback: bridgeFallbacks,
+		scriptPath: cliBridgeScript,
+	};
 	outputChannel.appendLine(`Workflow initialized in phase: ${Phase[workflowController.currentPhase]}`);
 	vscode.commands.executeCommand('setContext', 'codeMachine.phase', Phase[workflowController.currentPhase]);
 
@@ -39,13 +47,11 @@ export function activate(context: vscode.ExtensionContext) {
 	const phaseListener = workflowController.onDidPhaseChange(() => taskTreeProvider.refresh());
 
 	// Register commands
-	registerNewProjectCommand(context, outputChannel, primaryPython, fallbackCommands);
+	registerNewProjectCommand(context, outputChannel, cliInvoker);
 	registerShowArchitecturePreviewCommand(context);
 	registerApprovalCommands(context, workflowController, {
 		outputChannel,
-		extensionPath: context.extensionUri.fsPath,
-		pythonCommand: primaryPython,
-		pythonFallback: fallbackCommands,
+		cliInvoker,
 	});
 
 	const cliService = new CliService();
@@ -70,9 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 			outputChannel,
 			workspaceRoot,
 			reviewController,
-			context.extensionUri.fsPath,
-			primaryPython,
-			fallbackCommands,
+			cliInvoker,
 		);
 
 		workspaceServices = { workspaceRoot, gitService, buildController };
@@ -109,6 +113,10 @@ export function activate(context: vscode.ExtensionContext) {
 		return { ...services, workflowController };
 	};
 	registerRunBuildProcessCommand(context, getBuildProcessDependencies);
+
+	context.subscriptions.push(vscode.commands.registerCommand('codemachine.refreshArtifacts', () => {
+		artifactsTreeProvider.refresh();
+	}));
 
 	const runTaskCommand = vscode.commands.registerCommand('codemachine.runTask', async () => {
 		const services = ensureWorkspaceServices();

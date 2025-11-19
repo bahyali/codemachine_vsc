@@ -1,19 +1,27 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { WorkflowController, Phase } from '../controllers/WorkflowController';
 import { ARTIFACTS_DIR, ARCHITECTURE_FILENAME, PLAN_FILENAME, REQUIREMENTS_FILENAME, TODO_FILENAME } from '../constants';
 import { CliService } from '../services/CliService';
+import { CliInvoker } from '../models/CliInvoker';
 
 async function artifactExists(filename: string): Promise<boolean> {
     const files = await vscode.workspace.findFiles(`**/${ARTIFACTS_DIR}/${filename}`, '**/node_modules/**', 1);
     return files.length > 0;
 }
 
+async function openArtifact(workspaceUri: vscode.Uri, relative: string): Promise<void> {
+    const target = vscode.Uri.joinPath(workspaceUri, ARTIFACTS_DIR, relative);
+    try {
+        const doc = await vscode.workspace.openTextDocument(target);
+        await vscode.window.showTextDocument(doc, { preview: false });
+    } catch {
+        // Ignore if file cannot be opened (e.g., JSON yet to be created)
+    }
+}
+
 interface ApprovalDependencies {
     outputChannel: vscode.OutputChannel;
-    extensionPath: string;
-    pythonCommand: string;
-    pythonFallback: string[];
+    cliInvoker: CliInvoker;
 }
 
 function getWorkspaceInfo() {
@@ -35,7 +43,51 @@ export function registerApprovalCommands(
     deps: ApprovalDependencies,
 ) {
     const cliService = new CliService();
-    const cliPath = path.join(deps.extensionPath, 'tools', 'cli', 'codemachine_cli.py');
+
+    async function runStage(stage: 'architecture' | 'plan', artifactFilename: string): Promise<boolean> {
+        const workspaceInfo = getWorkspaceInfo();
+        if (!workspaceInfo) {
+            vscode.window.showErrorMessage('Open a workspace folder to continue.');
+            return false;
+        }
+        deps.outputChannel.show(true);
+        const args = [
+            deps.cliInvoker.scriptPath,
+            'generate',
+            '--project-name',
+            workspaceInfo.name,
+            '--workspace-uri',
+            workspaceInfo.uri,
+            '--until',
+            stage,
+        ];
+        const result = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Generating ${stage} artifacts...`,
+            cancellable: false,
+        }, async () => {
+            try {
+                await cliService.execute(
+                    deps.cliInvoker.command,
+                    args,
+                    deps.outputChannel,
+                    workspaceInfo.root,
+                    { fallbackCommands: deps.cliInvoker.fallback },
+                );
+                return true;
+            } catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`Failed to run ${stage} stage: ${message}`);
+                return false;
+            }
+        });
+
+        if (result) {
+            await openArtifact(vscode.Uri.file(workspaceInfo.root), artifactFilename);
+        }
+
+        return result;
+    }
 
     const approveRequirements = vscode.commands.registerCommand('codemachine.approveRequirements', async () => {
         if (workflowController.currentPhase !== Phase.Specs) {
@@ -45,6 +97,10 @@ export function registerApprovalCommands(
 
         if (!(await artifactExists(REQUIREMENTS_FILENAME))) {
             vscode.window.showErrorMessage('No requirements file found in .artifacts. Generate requirements before approving.');
+            return;
+        }
+
+        if (!(await runStage('architecture', ARCHITECTURE_FILENAME))) {
             return;
         }
 
@@ -60,6 +116,10 @@ export function registerApprovalCommands(
 
         if (!(await artifactExists(ARCHITECTURE_FILENAME))) {
             vscode.window.showErrorMessage('No architecture file found in .artifacts. Generate architecture before approving.');
+            return;
+        }
+
+        if (!(await runStage('plan', PLAN_FILENAME))) {
             return;
         }
 
@@ -84,26 +144,37 @@ export function registerApprovalCommands(
             return;
         }
 
-        deps.outputChannel.show(true);
-        try {
-            await cliService.execute(
-                deps.pythonCommand,
-                [
-                    cliPath,
-                    'extract-plan',
-                    '--project-name',
-                    workspaceInfo.name,
-                    '--workspace-uri',
-                    workspaceInfo.uri,
-                    '--force',
-                ],
-                deps.outputChannel,
-                workspaceInfo.root,
-                { fallbackCommands: deps.pythonFallback },
-            );
-        } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            vscode.window.showErrorMessage(`Failed to convert plan to todo.json: ${message}`);
+        const extractionOk = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Extracting plan to todo.json...',
+            cancellable: false,
+        }, async () => {
+            deps.outputChannel.show(true);
+            try {
+                await cliService.execute(
+                    deps.cliInvoker.command,
+                    [
+                        deps.cliInvoker.scriptPath,
+                        'extract-plan',
+                        '--project-name',
+                        workspaceInfo.name,
+                        '--workspace-uri',
+                        workspaceInfo.uri,
+                        '--force',
+                    ],
+                    deps.outputChannel,
+                    workspaceInfo.root,
+                    { fallbackCommands: deps.cliInvoker.fallback },
+                );
+                return true;
+            } catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`Failed to convert plan to todo.json: ${message}`);
+                return false;
+            }
+        });
+
+        if (!extractionOk) {
             return;
         }
 
@@ -111,6 +182,7 @@ export function registerApprovalCommands(
             vscode.window.showErrorMessage('Plan extraction did not produce todo.json. Check CLI output for details.');
             return;
         }
+        await openArtifact(vscode.Uri.file(workspaceInfo.root), TODO_FILENAME);
 
         workflowController.setPhase(Phase.Build);
         vscode.window.showInformationMessage('Plan approved. Build phase initiated.');

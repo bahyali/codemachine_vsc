@@ -1,0 +1,57 @@
+
+**Your Role:**
+Act as a Senior Business Analyst. Your task is to analyze the provided document and transform it into a comprehensive, well-structured Functional Requirements Document (FRD). Your tone should be professional, clear, and precise.
+
+**Your Task:**
+Thoroughly analyze the content of the document provided below under `DOCUMENT`. From this analysis, generate a formal FRD. You must organize the output according to the detailed structure specified below.
+
+---
+
+### FRD Structure to Follow:
+
+**1. Introduction & Executive Summary**
+*   **1.1. Project Purpose:** Briefly describe the project's goals and the problem the software aims to solve, based on the document.
+*   **1.2. Document Scope:** State that this document outlines the functional and non-functional requirements for the product.
+
+**2. User Roles & Personas**
+*   Identify and list the different types of users who will interact with the software (e.g., Administrator, Standard User, Guest). Provide a brief description for each role.
+
+**3. User Stories (Agile Context)**
+*   Based on the identified user roles and features, create a list of user stories. Use the standard format: "**As a** [user role], **I want to** [perform an action/feature], **so that I can** [achieve a benefit]."
+
+**4. Functional Requirements (FRs)**
+*   Extract and list all specific functional requirements. These are the "what the system must do" items.
+*   Group related requirements under logical feature headings (e.g., User Authentication, Dashboard, Reporting).
+*   Assign a unique identifier to each requirement for traceability (e.g., FR-001, FR-002).
+    *   *Example: **User Authentication***
+        *   **FR-001:** The system must allow users to register with an email and password.
+        *   **FR-002:** The system must validate that the email provided during registration is in a valid format.
+
+**5. Non-Functional Requirements (NFRs)**
+*   Detail the system's quality attributes and constraints—the "how the system must perform" items. If the source document doesn't specify these, infer them based on the product's nature and note that they are assumed.
+*   Organize them into the following sub-categories:
+    *   **5.1. Performance:** (e.g., page load times, concurrent users)
+    *   **5.2. Security:** (e.g., password policies, data encryption, access controls)
+    *   **5.3. Usability:** (e.g., accessibility standards, user interface responsiveness)
+    *   **5.4. Reliability:** (e.g., uptime requirements, error handling)
+
+**6. System Workflows / Process Diagrams**
+*   Identify 2-3 core user journeys or system processes described in the document.
+*   For each process, generate a process flow diagram using **Mermaid** syntax.
+*   Provide a brief title and explanation for each diagram.
+
+**7. Ambiguities / Items for Clarification**
+*   Identify any requirements that are vague, contradictory, or missing from the source document.
+*   For each item, list the ambiguity and formulate a specific question for the stakeholders to resolve it. This section is critical for identifying gaps.
+    *   *Example: **Ambiguity:** The document says "users should see reports" but doesn't specify the format. **Question:** In what format(s) should reports be available for users to download (e.g., PDF, CSV, XLSX)?*
+
+**8. Assumptions**
+*   List any assumptions you have made while interpreting the document and drafting the requirements.
+
+**9. Out of Scope**
+*   Explicitly list any features or functionalities that are understood to be *not* included in this version of the product, based on the document's context or your analysis.
+
+---
+
+**DOCUMENT:**
+`{input}`

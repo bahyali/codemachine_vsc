@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs/promises';
 import { GitService } from '../services/GitService';
+import { ARTIFACTS_DIR } from '../constants';
 
 export class ReviewController {
     constructor(
@@ -26,5 +28,40 @@ export class ReviewController {
             console.error(errorMessage);
             vscode.window.showErrorMessage(errorMessage);
         }
+    }
+
+    public async logDiffForLastCommit(outputChannel: vscode.OutputChannel): Promise<void> {
+        try {
+            const diff = await this.gitService.getDiff();
+            if (!diff) {
+                outputChannel.appendLine('No diff available for the last commit.');
+                return;
+            }
+            const diffPath = await this.persistDiff(diff);
+            if (diffPath) {
+                const doc = await vscode.workspace.openTextDocument(diffPath);
+                await vscode.window.showTextDocument(doc, { preview: true });
+            }
+        } catch (error) {
+            const message = `Failed to retrieve last commit diff: ${error instanceof Error ? error.message : String(error)}`;
+            console.error(message);
+            vscode.window.showErrorMessage(message);
+        }
+    }
+
+    private async persistDiff(diff: string): Promise<string | undefined> {
+        const debugDir = path.join(this.workspaceRoot, ARTIFACTS_DIR, 'debug', 'diffs');
+        try {
+            await fs.mkdir(debugDir, { recursive: true });
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filePath = path.join(debugDir, `diff-${timestamp}.patch`);
+            await fs.writeFile(filePath, diff, 'utf8');
+            return filePath;
+        } catch (error) {
+            const message = `Failed to write diff snapshot: ${error instanceof Error ? error.message : String(error)}`;
+            console.error(message);
+        }
+
+        return undefined;
     }
 }

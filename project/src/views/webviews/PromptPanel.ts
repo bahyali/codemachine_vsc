@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { CliService } from '../../services/CliService';
 import { ARTIFACTS_DIR, REQUIREMENTS_FILENAME } from '../../constants';
+import { CliInvoker } from '../../models/CliInvoker';
 
 /**
  * Manages the webview panel for creating a new project.
@@ -15,15 +15,13 @@ export class PromptPanel {
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionUri: vscode.Uri;
     private readonly _outputChannel: vscode.OutputChannel;
-    private readonly _pythonCommand: string;
-    private readonly _pythonFallback: string[];
+    private readonly _cliInvoker: CliInvoker;
     private _disposables: vscode.Disposable[] = [];
 
     public static createOrShow(
         extensionUri: vscode.Uri,
         outputChannel: vscode.OutputChannel,
-        pythonCommand: string,
-        pythonFallback: string[],
+        invoker: CliInvoker,
     ) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
@@ -47,21 +45,19 @@ export class PromptPanel {
             }
         );
 
-        PromptPanel.currentPanel = new PromptPanel(panel, extensionUri, outputChannel, pythonCommand, pythonFallback);
+        PromptPanel.currentPanel = new PromptPanel(panel, extensionUri, outputChannel, invoker);
     }
 
     private constructor(
         panel: vscode.WebviewPanel,
         extensionUri: vscode.Uri,
         outputChannel: vscode.OutputChannel,
-        pythonCommand: string,
-        pythonFallback: string[],
+        invoker: CliInvoker,
     ) {
         this._panel = panel;
         this._extensionUri = extensionUri;
         this._outputChannel = outputChannel;
-        this._pythonCommand = pythonCommand;
-        this._pythonFallback = pythonFallback;
+        this._cliInvoker = invoker;
 
         // Set the webview's initial html content
         this._update();
@@ -102,14 +98,11 @@ export class PromptPanel {
         }, async (progress) => {
             progress.report({ increment: 0, message: "Starting CLI..." });
             try {
-                const cliPath = path.join(this._extensionUri.fsPath, 'tools', 'cli', 'codemachine_cli.py');
-                
-                // The mock CLI needs to create `requirements.md` in the `cwd`.
                 this._outputChannel.show(true);
                 await cliService.execute(
-                    this._pythonCommand,
+                    this._cliInvoker.command,
                     [
-                        cliPath,
+                        this._cliInvoker.scriptPath,
                         'generate',
                         '--project-name',
                         projectName,
@@ -117,10 +110,12 @@ export class PromptPanel {
                         prompt,
                         '--workspace-uri',
                         workspaceUri,
+                        '--until',
+                        'requirements',
                     ],
                     this._outputChannel,
                     workspaceRoot,
-                    { fallbackCommands: this._pythonFallback },
+                    { fallbackCommands: this._cliInvoker.fallback },
                 );
                 
                 progress.report({ increment: 100, message: "Requirements generated." });

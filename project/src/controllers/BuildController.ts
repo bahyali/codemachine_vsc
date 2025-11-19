@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { CliService } from '../services/CliService';
 import { GitService } from '../services/GitService';
 import { ReviewController } from './ReviewController';
+import { CliInvoker } from '../models/CliInvoker';
 
 export class BuildController {
     private currentTaskId: string | undefined;
@@ -13,9 +13,7 @@ export class BuildController {
         private readonly outputChannel: vscode.OutputChannel,
         private readonly workspaceRoot: string,
         private readonly reviewController: ReviewController,
-        private readonly extensionPath: string,
-        private readonly pythonCommand: string,
-        private readonly pythonFallback: string[],
+        private readonly cliInvoker: CliInvoker,
     ) {}
 
     public getCurrentTaskId(): string | undefined {
@@ -32,7 +30,6 @@ export class BuildController {
             this.outputChannel.appendLine(`> With feedback: ${feedback}`);
         }
         try {
-            const cliPath = path.join(this.extensionPath, 'tools', 'cli', 'codemachine_cli.py');
             const workspaceUri = vscode.Uri.file(this.workspaceRoot).toString();
             const args = ['run', '--task-id', taskId, '--workspace-uri', workspaceUri];
             if (feedback) {
@@ -42,11 +39,11 @@ export class BuildController {
             }
 
             await this.cliService.execute(
-                this.pythonCommand,
-                [cliPath, ...args],
+                this.cliInvoker.command,
+                [this.cliInvoker.scriptPath, ...args],
                 this.outputChannel,
                 this.workspaceRoot,
-                { fallbackCommands: this.pythonFallback },
+                { fallbackCommands: this.cliInvoker.fallback },
             );
             
             this.outputChannel.appendLine(`Task ${taskId} completed successfully.`);
@@ -54,9 +51,11 @@ export class BuildController {
             await this.gitService.stageAllChanges();
             this.outputChannel.appendLine(`Changes for task ${taskId} staged.`);
 
-            vscode.window.showInformationMessage(`Task ${taskId} finished. Changes are staged and ready for review.`);
+            await this.gitService.commit(`feat(${taskId}): apply automated changes`);
+            this.outputChannel.appendLine(`Committed results for task ${taskId}.`);
+            await this.reviewController.logDiffForLastCommit(this.outputChannel);
 
-            await this.reviewController.showDiffForStagedChanges();
+            vscode.window.showInformationMessage(`Task ${taskId} finished. Diff logged to Code Machine output.`);
 
         } catch (error) {
             const errorMessage = `Failed to run task ${taskId}: ${error instanceof Error ? error.message : String(error)}`;

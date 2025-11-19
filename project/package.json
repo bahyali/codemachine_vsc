@@ -19,6 +19,7 @@
     "onCommand:codemachine.approveRequirements",
     "onCommand:codemachine.approveArchitecture",
     "onCommand:codemachine.resetWorkflowPhase",
+    "onCommand:codemachine.refreshArtifacts",
     "onCommand:codemachine.runTask",
     "onCommand:codemachine.acceptChanges",
     "onCommand:codemachine.rejectChanges"
@@ -51,6 +52,11 @@
       {
         "command": "codemachine.runBuildProcess",
         "title": "Code Machine: Run Build Process",
+        "category": "Code Machine"
+      },
+      {
+        "command": "codemachine.refreshArtifacts",
+        "title": "Code Machine: Refresh Artifacts View",
         "category": "Code Machine"
       },
       {
@@ -124,6 +130,12 @@
           "when": "view == codeMachine.projectState",
           "group": "navigation@1",
           "icon": "$(history)"
+        },
+        {
+          "command": "codemachine.refreshArtifacts",
+          "when": "view == codeMachine.artifacts",
+          "group": "navigation",
+          "icon": "$(refresh)"
         }
       ]
     }

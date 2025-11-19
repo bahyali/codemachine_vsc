@@ -8,6 +8,9 @@ import { EOL } from 'os';
 import { ARTIFACTS_DIR, ARCHITECTURE_FILENAME, PLAN_FILENAME, REQUIREMENTS_FILENAME, TODO_FILENAME } from '../../../constants';
 
 process.env.CODEMACHINE_CLI_MODE = 'mock';
+process.env.CODEMACHINE_CLI_ADAPTER = 'python';
+process.env.CODEMACHINE_PYTHON = process.env.CODEMACHINE_PYTHON ?? 'python3';
+process.env.CODEMACHINE_PYTHON = process.env.CODEMACHINE_PYTHON ?? 'python3';
 
 suite('CliService Test Suite', () => {
     let cliService: CliService;
@@ -16,8 +19,8 @@ suite('CliService Test Suite', () => {
     let workspaceDir: string;
     let workspaceUri: string;
 
-    // Resolve path from out/test/suite/services -> project root -> tools/cli
-    const cliPath = path.resolve(__dirname, '../../../../tools/cli/codemachine_cli.py');
+    // Resolve path from out/test/suite/services -> project root -> tools/bridge
+    const bridgePath = path.resolve(__dirname, '../../../../tools/bridge/cliBridge.js');
 
     setup(async () => {
         output = '';
@@ -42,9 +45,9 @@ suite('CliService Test Suite', () => {
 
     test('should generate artifacts inside .artifacts folder', async () => {
         await cliService.execute(
-            'python3',
+            'node',
             [
-                cliPath,
+                bridgePath,
                 'generate',
                 '--project-name',
                 'Demo Project',
@@ -63,7 +66,7 @@ suite('CliService Test Suite', () => {
         const todoPath = path.join(artifactsDir, TODO_FILENAME);
 
         const requirementsContent = await fs.readFile(requirementsPath, 'utf-8');
-        assert.ok(requirementsContent.includes('Demo Project Requirements'), 'Requirements file should mention project name');
+        assert.ok(requirementsContent.includes('Demo Project'), 'Requirements file should mention project name');
 
         const todoContent = await fs.readFile(todoPath, 'utf-8');
         const todoJson = JSON.parse(todoContent);
@@ -74,7 +77,7 @@ suite('CliService Test Suite', () => {
             fs.access(planPath),
         ]);
 
-        assert.ok(output.includes('> Running command: python3'), 'Should log the command being run');
+        assert.ok(output.includes('> Running command: node'), 'Should log the command being run');
         assert.ok(output.includes('LLM mode: mock'), 'Should log mock mode');
         assert.ok(output.includes('> Command finished with exit code 0.'), 'Should log successful exit code');
     });
@@ -83,9 +86,9 @@ suite('CliService Test Suite', () => {
         await assert.rejects(
             async () => {
                 await cliService.execute(
-                    'python3',
+                    'node',
                     [
-                        cliPath,
+                        bridgePath,
                         'generate',
                         '--project-name',
                         'Failing Project',
@@ -129,7 +132,7 @@ suite('CliService Test Suite', () => {
     test('should try fallback command when primary executable is missing', async () => {
         const nonExistentCommand = 'this_command_does_not_exist_67890';
         const args = [
-            cliPath,
+            bridgePath,
             'generate',
             '--project-name',
             'Fallback Project',
@@ -139,10 +142,10 @@ suite('CliService Test Suite', () => {
             workspaceUri,
         ];
 
-        await cliService.execute(nonExistentCommand, args, mockOutputChannel, undefined, { fallbackCommands: ['python3'] });
+        await cliService.execute(nonExistentCommand, args, mockOutputChannel, undefined, { fallbackCommands: ['node', 'nodejs'] });
 
         assert.ok(output.includes('Trying next fallback'), 'Should log fallback attempt');
-        assert.ok(output.includes('> Running command: python3'), 'Should eventually run the fallback command');
+        assert.ok(output.includes('> Running command: node'), 'Should eventually run the fallback command');
         assert.ok(output.includes('> Command finished with exit code 0.'), 'Should complete successfully via fallback');
     });
 });
