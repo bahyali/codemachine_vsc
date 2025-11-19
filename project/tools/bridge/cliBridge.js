@@ -2,6 +2,7 @@
 
 const { runPythonAdapter } = require('./adapters/pythonAdapter');
 const { runCodexAdapter } = require('./adapters/codexAdapter');
+const { runCodeMachineAdapter } = require('./adapters/codeMachineAdapter');
 
 const DEFAULT_ADAPTER = process.env.CODEMACHINE_CLI_ADAPTER || 'python';
 
@@ -30,6 +31,7 @@ function run() {
   const adapters = {
     python: runPythonAdapter,
     codex: runCodexAdapter,
+    codemachine: runCodeMachineAdapter,
   };
   const impl = adapters[adapter];
   if (!impl) {

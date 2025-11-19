@@ -50,3 +50,7 @@ All commands accept `--fail` to simulate an error for automated tests. Set
 ## Codex adapter
 
 Set `CODEMACHINE_CLI_ADAPTER=codex` (and ensure the `codex` CLI is authenticated) to let Codex act as the Type A pipeline instead of invoking the Python CLI. The Node bridge translates each `generate`/`run` command into a detailed Codex prompt, so you can swap between adapters without changing the VS Code extension. Use `CODEMACHINE_CODEX_FLAGS` to append additional `codex` CLI flags if needed.
+
+## CodeMachine adapter
+
+Set `CODEMACHINE_CLI_ADAPTER=codemachine` to route actions through the CodeMachine CLI (`codemachine`). The bridge constructs stage-specific prompts and feeds them to `codemachine run` using the planner and builder agents (override via `CODEMACHINE_PLAN_AGENT` and `CODEMACHINE_BUILD_AGENT`). This makes it easy to test Type A flows with CodeMachine’s orchestration without modifying the extension.

@@ -9,10 +9,13 @@
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "npm: compile",
       "env": {
+        // the MODE can be "mock" or "real"
         "CODEMACHINE_CLI_MODE": "real",
+        // DEV PYTHON CLI SPECIFIC ENV VARS 
         "CODEMACHINE_LLM_MODEL": "gpt-4o-mini",
-        "CODEMACHINE_LLM_API_KEY": "REPLACE_WITH_API_KEY",
+        "CODEMACHINE_LLM_API_KEY": "${env:OPENAI_API_KEY}",
         "CODEMACHINE_LLM_API_BASE": "",
+        // REAL CLI SPECIFIC ENV VARS
         "CODEMACHINE_PYTHON":"${workspaceFolder}/tools/cli/.venv/bin/python",
         "CODEMACHINE_CLI_ADAPTER": "codex"
 
