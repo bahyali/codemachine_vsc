@@ -77,6 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
 			workspaceRoot,
 			reviewController,
 			cliInvoker,
+			() => taskTreeProvider.refresh(),
 		);
 
 		workspaceServices = { workspaceRoot, gitService, buildController };

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { CliService } from '../services/CliService';
 import { GitService } from '../services/GitService';
 import { ReviewController } from './ReviewController';
+import { setActiveTaskId, markTaskCompleted } from '../state/TaskState';
 import { CliInvoker } from '../models/CliInvoker';
 
 export class BuildController {
@@ -14,6 +15,7 @@ export class BuildController {
         private readonly workspaceRoot: string,
         private readonly reviewController: ReviewController,
         private readonly cliInvoker: CliInvoker,
+        private readonly onTaskStateChanged: () => void,
     ) {}
 
     public getCurrentTaskId(): string | undefined {
@@ -54,7 +56,9 @@ export class BuildController {
             await this.gitService.commit(`feat(${taskId}): apply automated changes`);
             this.outputChannel.appendLine(`Committed results for task ${taskId}.`);
             await this.reviewController.logDiffForLastCommit(this.outputChannel);
-
+            markTaskCompleted(taskId);
+            setActiveTaskId(undefined);
+            this.onTaskStateChanged();
             vscode.window.showInformationMessage(`Task ${taskId} finished. Diff logged to Code Machine output.`);
 
         } catch (error) {
@@ -63,16 +67,24 @@ export class BuildController {
             vscode.window.showErrorMessage(errorMessage);
             // If the task fails, there's no active task to review.
             this.currentTaskId = undefined;
+            setActiveTaskId(undefined);
+            this.onTaskStateChanged();
         }
     }
 
     public async runTask(taskId: string): Promise<void> {
         this.currentTaskId = taskId;
+        setActiveTaskId(taskId);
+        vscode.commands.executeCommand('setContext', 'codeMachine.currentTask', taskId);
+        this.onTaskStateChanged();
         await this.executeTask(taskId);
     }
 
     public async retryTask(taskId: string, feedback: string): Promise<void> {
         this.currentTaskId = taskId;
+        setActiveTaskId(taskId);
+        vscode.commands.executeCommand('setContext', 'codeMachine.currentTask', taskId);
+        this.onTaskStateChanged();
         await this.executeTask(taskId, feedback);
     }
 }
