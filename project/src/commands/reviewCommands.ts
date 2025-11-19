@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { BuildController } from '../controllers/BuildController';
 import { GitService } from '../services/GitService';
+import { ARTIFACTS_DIR, TODO_FILENAME } from '../constants';
 
 import { Iteration, TodoPlan } from '../models/task';
 
@@ -31,13 +32,26 @@ function findAndupdateTaskStatus(iterations: Iteration[], taskId: string, newSta
     return false;
 }
 
+export interface ReviewDependencies {
+    buildController: BuildController;
+    gitService: GitService;
+    workspaceRoot: string;
+}
+
+export type ReviewDependenciesProvider = () => ReviewDependencies | undefined;
+
 export function registerReviewCommands(
     context: vscode.ExtensionContext,
-    buildController: BuildController,
-    gitService: GitService,
-    workspaceRoot: string
+    getDependencies: ReviewDependenciesProvider,
 ) {
     const acceptCommand = vscode.commands.registerCommand('codemachine.acceptChanges', async () => {
+        const deps = getDependencies();
+        if (!deps) {
+            vscode.window.showErrorMessage('Open a workspace folder before accepting Code Machine changes.');
+            return;
+        }
+
+        const { buildController, gitService, workspaceRoot } = deps;
         const taskId = buildController.getCurrentTaskId();
         if (!taskId) {
             vscode.window.showErrorMessage('No task is currently under review.');
@@ -45,7 +59,7 @@ export function registerReviewCommands(
         }
 
         try {
-            const todoJsonPath = path.join(workspaceRoot, 'artifacts', 'todo.json');
+            const todoJsonPath = path.join(workspaceRoot, ARTIFACTS_DIR, TODO_FILENAME);
             const todoJsonContent = await fs.readFile(todoJsonPath, 'utf-8');
             const plan: TodoPlan = JSON.parse(todoJsonContent);
 
@@ -71,6 +85,13 @@ export function registerReviewCommands(
     });
 
     const rejectCommand = vscode.commands.registerCommand('codemachine.rejectChanges', async () => {
+        const deps = getDependencies();
+        if (!deps) {
+            vscode.window.showErrorMessage('Open a workspace folder before rejecting Code Machine changes.');
+            return;
+        }
+
+        const { buildController, gitService } = deps;
         const taskId = buildController.getCurrentTaskId();
         if (!taskId) {
             vscode.window.showErrorMessage('No task is currently under review.');

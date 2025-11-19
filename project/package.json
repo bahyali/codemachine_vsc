@@ -15,6 +15,10 @@
     "onCommand:codemachine.newProject",
     "onCommand:codemachine.showArchitecturePreview",
     "onCommand:codemachine.approvePlan",
+    "onCommand:codemachine.runBuildProcess",
+    "onCommand:codemachine.approveRequirements",
+    "onCommand:codemachine.approveArchitecture",
+    "onCommand:codemachine.resetWorkflowPhase",
     "onCommand:codemachine.runTask",
     "onCommand:codemachine.acceptChanges",
     "onCommand:codemachine.rejectChanges"
@@ -31,8 +35,28 @@
         "title": "Code Machine: Show Architecture Preview"
       },
       {
+        "command": "codemachine.approveRequirements",
+        "title": "Code Machine: Approve Requirements",
+        "category": "Code Machine"
+      },
+      {
+        "command": "codemachine.approveArchitecture",
+        "title": "Code Machine: Approve Architecture",
+        "category": "Code Machine"
+      },
+      {
         "command": "codemachine.approvePlan",
         "title": "Code Machine: Approve Plan"
+      },
+      {
+        "command": "codemachine.runBuildProcess",
+        "title": "Code Machine: Run Build Process",
+        "category": "Code Machine"
+      },
+      {
+        "command": "codemachine.resetWorkflowPhase",
+        "title": "Code Machine: Reset Project Phase",
+        "category": "Code Machine"
       },
       {
         "command": "codemachine.runTask",
@@ -72,6 +96,34 @@
         {
           "id": "codeMachine.artifacts",
           "name": "Artifacts"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "codemachine.approveRequirements",
+          "when": "view == codeMachine.projectState && codeMachine.phase == 'Specs'",
+          "group": "navigation",
+          "icon": "$(pass)"
+        },
+        {
+          "command": "codemachine.approveArchitecture",
+          "when": "view == codeMachine.projectState && codeMachine.phase == 'Arch'",
+          "group": "navigation",
+          "icon": "$(pass)"
+        },
+        {
+          "command": "codemachine.approvePlan",
+          "when": "view == codeMachine.projectState && codeMachine.phase == 'Plan'",
+          "group": "navigation",
+          "icon": "$(debug-start)"
+        },
+        {
+          "command": "codemachine.resetWorkflowPhase",
+          "when": "view == codeMachine.projectState",
+          "group": "navigation@1",
+          "icon": "$(history)"
         }
       ]
     }

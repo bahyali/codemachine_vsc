@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { CliService } from '../../services/CliService';
+import { ARTIFACTS_DIR, REQUIREMENTS_FILENAME } from '../../constants';
 
 /**
  * Manages the webview panel for creating a new project.
@@ -13,9 +14,10 @@ export class PromptPanel {
 
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionUri: vscode.Uri;
+    private readonly _outputChannel: vscode.OutputChannel;
     private _disposables: vscode.Disposable[] = [];
 
-    public static createOrShow(extensionUri: vscode.Uri) {
+    public static createOrShow(extensionUri: vscode.Uri, outputChannel: vscode.OutputChannel) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
@@ -23,6 +25,7 @@ export class PromptPanel {
         // If we already have a panel, show it.
         if (PromptPanel.currentPanel) {
             PromptPanel.currentPanel._panel.reveal(column);
+            PromptPanel.currentPanel._outputChannel.show(true);
             return;
         }
 
@@ -37,12 +40,13 @@ export class PromptPanel {
             }
         );
 
-        PromptPanel.currentPanel = new PromptPanel(panel, extensionUri);
+        PromptPanel.currentPanel = new PromptPanel(panel, extensionUri, outputChannel);
     }
 
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, outputChannel: vscode.OutputChannel) {
         this._panel = panel;
         this._extensionUri = extensionUri;
+        this._outputChannel = outputChannel;
 
         // Set the webview's initial html content
         this._update();
@@ -73,7 +77,7 @@ export class PromptPanel {
         }
         const workspaceFolder = workspaceFolders[0];
         const workspaceRoot = workspaceFolder.uri.fsPath;
-        const outputChannel = vscode.window.createOutputChannel('Code Machine');
+        const workspaceUri = workspaceFolder.uri.toString();
         const cliService = new CliService();
 
         await vscode.window.withProgress({
@@ -87,7 +91,23 @@ export class PromptPanel {
                 const cliPath = path.join(this._extensionUri.fsPath, 'test', 'mocks', 'mock_cli.py');
                 
                 // The mock CLI needs to create `requirements.md` in the `cwd`.
-                await cliService.execute('python', [cliPath, '--prompt', prompt, '--project-name', projectName], outputChannel, workspaceRoot);
+                this._outputChannel.show(true);
+                await cliService.execute(
+                    'python',
+                    [
+                        cliPath,
+                        'generate',
+                        '--project-name',
+                        projectName,
+                        '--prompt',
+                        prompt,
+                        '--workspace-uri',
+                        workspaceUri,
+                    ],
+                    this._outputChannel,
+                    workspaceRoot,
+                    { fallbackCommands: ['python3', 'py'] },
+                );
                 
                 progress.report({ increment: 100, message: "Requirements generated." });
                 
@@ -95,7 +115,7 @@ export class PromptPanel {
                 this.dispose();
 
                 // Open the requirements.md file
-                const requirementsPath = vscode.Uri.joinPath(workspaceFolder.uri, 'requirements.md');
+                const requirementsPath = vscode.Uri.joinPath(workspaceFolder.uri, ARTIFACTS_DIR, REQUIREMENTS_FILENAME);
                 const document = await vscode.workspace.openTextDocument(requirementsPath);
                 await vscode.window.showTextDocument(document);
 

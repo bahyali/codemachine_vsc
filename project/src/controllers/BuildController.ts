@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { CliService } from '../services/CliService';
 import { GitService } from '../services/GitService';
 import { ReviewController } from './ReviewController';
@@ -12,6 +13,7 @@ export class BuildController {
         private readonly outputChannel: vscode.OutputChannel,
         private readonly workspaceRoot: string,
         private readonly reviewController: ReviewController,
+        private readonly extensionPath: string,
     ) {}
 
     public getCurrentTaskId(): string | undefined {
@@ -28,15 +30,22 @@ export class BuildController {
             this.outputChannel.appendLine(`> With feedback: ${feedback}`);
         }
         try {
-            const cliPath = 'test/mocks/mock_cli.py';
-            const args = ['run', '--task-id', taskId];
+            const cliPath = path.join(this.extensionPath, 'test', 'mocks', 'mock_cli.py');
+            const workspaceUri = vscode.Uri.file(this.workspaceRoot).toString();
+            const args = ['run', '--task-id', taskId, '--workspace-uri', workspaceUri];
             if (feedback) {
                 // Assuming feedback is passed as an argument. The exact format might need adjustment
                 // based on the CLI's implementation.
                 args.push('--feedback', feedback);
             }
 
-            await this.cliService.execute('python', [cliPath, ...args], this.outputChannel, this.workspaceRoot);
+            await this.cliService.execute(
+                'python',
+                [cliPath, ...args],
+                this.outputChannel,
+                this.workspaceRoot,
+                { fallbackCommands: ['python3', 'py'] },
+            );
             
             this.outputChannel.appendLine(`Task ${taskId} completed successfully.`);
             
