@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const ARTIFACTS_DIR = '.artifacts';
-const PROMPTS_DIR = path.resolve(__dirname, '../../cli/prompts');
+const PROMPTS_DIR = path.resolve(__dirname, '../../prompts');
 
 function loadPromptText(filename, fallback = '') {
   const candidates = [

@@ -19,11 +19,7 @@ function runCodexAdapter(cliArgs) {
   }
 
   const codexArgs = [
-    '--full-auto',
-    '--ask-for-approval',
-    'on-failure',
-    '--sandbox',
-    'workspace-write',
+    '--yolo',
     'exec',
   ];
   if (workspacePath) {

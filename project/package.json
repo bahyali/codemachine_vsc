@@ -18,6 +18,7 @@
     "onCommand:codemachine.runBuildProcess",
     "onCommand:codemachine.approveRequirements",
     "onCommand:codemachine.approveArchitecture",
+    "onCommand:codemachine.remakeCurrentStep",
     "onCommand:codemachine.resetWorkflowPhase",
     "onCommand:codemachine.refreshArtifacts",
     "onCommand:codemachine.runTask",
@@ -48,6 +49,11 @@
       {
         "command": "codemachine.approvePlan",
         "title": "Code Machine: Approve Plan"
+      },
+      {
+        "command": "codemachine.remakeCurrentStep",
+        "title": "Code Machine: Remake Current Step",
+        "category": "Code Machine"
       },
       {
         "command": "codemachine.runBuildProcess",
@@ -124,6 +130,12 @@
           "when": "view == codeMachine.projectState && codeMachine.phase == 'Plan'",
           "group": "navigation",
           "icon": "$(debug-start)"
+        },
+        {
+          "command": "codemachine.remakeCurrentStep",
+          "when": "view == codeMachine.projectState && (codeMachine.phase == 'Specs' || codeMachine.phase == 'Arch' || codeMachine.phase == 'Plan')",
+          "group": "navigation@0",
+          "icon": "$(debug-restart)"
         },
         {
           "command": "codemachine.resetWorkflowPhase",

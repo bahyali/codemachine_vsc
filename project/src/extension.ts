@@ -7,6 +7,7 @@ import { registerShowArchitecturePreviewCommand } from './commands/showArchitect
 import { registerApprovalCommands } from './commands/approvePlan';
 import { registerReviewCommands, ReviewDependencies } from './commands/reviewCommands';
 import { registerRunBuildProcessCommand } from './commands/runBuildProcess';
+import { registerRemakeCurrentStepCommand } from './commands/remakeCurrentStep';
 import { TaskTreeProvider } from './views/sidebar/TaskTreeProvider';
 import { ProjectStateProvider } from './views/sidebar/ProjectStateProvider';
 import { ArtifactsTreeProvider } from './views/sidebar/ArtifactsTreeProvider';
@@ -50,6 +51,10 @@ export function activate(context: vscode.ExtensionContext) {
 	registerNewProjectCommand(context, outputChannel, cliInvoker);
 	registerShowArchitecturePreviewCommand(context);
 	registerApprovalCommands(context, workflowController, {
+		outputChannel,
+		cliInvoker,
+	});
+	registerRemakeCurrentStepCommand(context, workflowController, {
 		outputChannel,
 		cliInvoker,
 	});
