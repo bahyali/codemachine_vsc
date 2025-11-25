@@ -42,3 +42,4 @@ yarn-error.log*
 
 # generated debug diffs
 .artifacts/debug/
+projects/

@@ -19,8 +19,9 @@ function runCodexAdapter(cliArgs) {
   }
 
   const codexArgs = [
-    '--yolo',
+
     'exec',
+    '--yolo',
   ];
   if (workspacePath) {
     codexArgs.push('--cd', workspacePath);
@@ -33,7 +34,8 @@ function runCodexAdapter(cliArgs) {
 
   const child = spawn('codex', codexArgs, {
     stdio: 'inherit',
-    env: process.env,
+    env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' },
+    cwd: workspacePath || process.cwd(),
   });
 
   child.on('error', (error) => {
